@@ -15,16 +15,17 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "noEmitOnError": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "strictNullChecks": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "target": "es5",
     "lib": [
       "dom",
       "es2015"
-    ]
+    ],
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"

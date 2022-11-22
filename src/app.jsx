@@ -3,6 +3,7 @@ import './app.css'
 import InputRect from './components/InputRect'
 import TranslateRect from './components/TranslateRect'
 import VisRect from './components/VisRect'
+// import RightDrawer from './components/RightDrawer'
 
 
 export default class Example extends React.Component {
@@ -62,6 +63,7 @@ export default class Example extends React.Component {
         </div>
 
         <VisRect data={this.state.data} />
+        {/* <RightDrawer /> */}
       </div>
     )
   }

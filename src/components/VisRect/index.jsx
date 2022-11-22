@@ -1,9 +1,12 @@
 import React from 'react'
-import { Graph, Addon, Shape } from '@antv/x6'
+import { Graph, Addon } from '@antv/x6'
 import './index.css'
+import { Conv, ConvTranspose } from './blocks/conv'
+import { Input1d, Input2d, Input3d } from './blocks/input'
+import { MaxPool } from './blocks/pool'
+import RightDrawer from "../RightDrawer"
 
 const { Stencil } = Addon
-const { Rect, Circle } = Shape
 
 export default class VisRect extends React.Component {
   componentDidMount() {
@@ -22,135 +25,49 @@ export default class VisRect extends React.Component {
       },
     })
 
-    this.graph.on('cell:added', ({ e, x, y, node, view }) => { 
-      console.log(this.graph.getCells());
-      console.log(e, x, y, node, view);
-    })
-    
-    this.graph.on('cell:click', ({ e, x, y, cell, view }) => { 
-      console.log(e, x, y, cell, view)
-    })
+    // this.graph.on('cell:added', ({ e, x, y, node, view }) => {
+    //   console.log(this.graph.getCells());
+    //   console.log(e, x, y, node, view);
+    // })
 
+    this.graph.on('cell:dblclick', ({ e, x, y, cell, view }) => {
+      if (cell.label.slice(0, 5) === "Input") {
+        alert("ss")
 
-    const source = this.graph.addNode({
-      x: 130,
-      y: 30,
-      width: 100,
-      height: 40,
-      attrs: {
-        label: {
-          text: 'Hello',
-          fill: '#6a6c8a',
-        },
-        body: {
-          stroke: '#31d0c6',
-        },
-      },
+        console.log(cell.label)
+        console.log(cell.data)
+      }
+
     })
 
-    const target = this.graph.addNode({
-      x: 320,
-      y: 240,
-      width: 100,
-      height: 40,
-      attrs: {
-        label: {
-          text: 'World',
-          fill: '#6a6c8a',
-        },
-        body: {
-          stroke: '#31d0c6',
-        },
-      },
-    })
-
-    this.graph.addEdge({ source, target })
 
     this.graph.centerContent()
 
     const stencil = new Stencil({
-      title: 'Components',
+      title: '基础模块',
       target: this.graph,
       search(cell, keyword) {
         return cell.shape.indexOf(keyword) !== -1
       },
-      placeholder: 'Search by shape name',
-      notFoundText: 'Not Found',
+      placeholder: '根据名称搜索',
+      notFoundText: '没有找到',
       collapsable: true,
       stencilGraphWidth: 200,
-      stencilGraphHeight: 180,
+      stencilGraphHeight: 280,
       groups: [
-        {
-          name: 'group1',
-          title: 'Group(Collapsable)',
-        },
-        {
-          name: 'group2',
-          title: 'Group',
-          collapsable: false,
-        },
+        { name: 'Input', title: '输入', graphHeight: 120, layoutOptions: { columns: 2, marginX: 10, center: false, rowHeight: 50 } },
+        { name: 'Conv', title: '卷积层', graphHeight: 120, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
+        { name: 'Pool', title: '池化层', graphHeight: 60, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
       ],
     })
 
 
     this.stencilContainer.appendChild(stencil.container)
 
-    const r = new Rect({
-      width: 70,
-      height: 40,
-      attrs: {
-        rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
-        text: { text: 'rect', fill: 'white' },
-      },
-    })
 
-    const c = new Circle({
-      width: 60,
-      height: 60,
-      attrs: {
-        circle: { fill: '#FE854F', strokeWidth: 6, stroke: '#4B4A67' },
-        text: { text: 'ellipse', fill: 'white' },
-      },
-    })
-
-    const c2 = new Circle({
-      width: 60,
-      height: 60,
-      attrs: {
-        circle: { fill: '#4B4A67', 'stroke-width': 6, stroke: '#FE854F' },
-        text: { text: 'ellipse', fill: 'white' },
-      },
-    })
-
-    const r2 = new Rect({
-      width: 70,
-      height: 40,
-      attrs: {
-        rect: { fill: '#4B4A67', stroke: '#31D0C6', strokeWidth: 6 },
-        text: { text: 'rect', fill: 'white' },
-      },
-    })
-
-    const r3 = new Rect({
-      width: 70,
-      height: 40,
-      attrs: {
-        rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
-        text: { text: 'rect', fill: 'white' },
-      },
-    })
-
-    const c3 = new Circle({
-      width: 60,
-      height: 60,
-      attrs: {
-        circle: { fill: '#FE854F', strokeWidth: 6, stroke: '#4B4A67' },
-        text: { text: 'ellipse', fill: 'white' },
-      },
-    })
-
-    stencil.load([r, c, c2, r2.clone()], 'group1')
-    stencil.load([c2.clone(), r2, r3, c3], 'group2')
+    stencil.load([Input1d, Input2d, Input3d], 'Input')
+    stencil.load([Conv, ConvTranspose], 'Conv')
+    stencil.load([MaxPool], 'Pool')
   }
 
   refContainer = (container) => {
@@ -163,9 +80,12 @@ export default class VisRect extends React.Component {
 
   render() {
     return (
-      <div className="app">
-        <div className="app-stencil" ref={this.refStencil} />
-        <div className="app-content" ref={this.refContainer}   />
+      <div>
+        <RightDrawer />
+        <div className="app">
+          <div className="app-stencil" ref={this.refStencil} />
+          <div className="app-content" ref={this.refContainer} />
+        </div>
       </div>
     )
   }
