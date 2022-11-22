@@ -7,8 +7,11 @@ import { MaxPool } from './blocks/pool'
 import RightDrawer from "../RightDrawer"
 
 const { Stencil } = Addon
-
 export default class VisRect extends React.Component {
+  state = { //只有state里的值发生变化，才会重新渲染
+    open: false
+  }
+  
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
@@ -32,7 +35,8 @@ export default class VisRect extends React.Component {
 
     this.graph.on('cell:dblclick', ({ e, x, y, cell, view }) => {
       if (cell.label.slice(0, 5) === "Input") {
-        alert("ss")
+
+        this.setState({open:true}) 
 
         console.log(cell.label)
         console.log(cell.data)
@@ -78,10 +82,11 @@ export default class VisRect extends React.Component {
     this.stencilContainer = container
   }
 
+
   render() {
     return (
       <div>
-        <RightDrawer />
+        <RightDrawer open={this.state.open} setOpen={this.setOpen} />
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
           <div className="app-content" ref={this.refContainer} />
@@ -89,4 +94,11 @@ export default class VisRect extends React.Component {
       </div>
     )
   }
+
+  setOpen = (newState) => {
+    this.setState({
+      open: newState
+    })
+  }
+
 }

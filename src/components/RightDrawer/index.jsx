@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+// import React, { useState } from 'react';
+// import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from 'antd';
 const { Option } = Select;
-const App = () => {
-  console.log("first")
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
+const App = (props) => {
+  console.log("first",props)
+  const {open, setOpen} = props
+  // const [open, setOpen] = useState(false);
+  // const showDrawer = () => {
+  //   setOpen(true);
+  // };
   const onClose = () => {
     setOpen(false);
   };
   return (
     <>
-      <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
+      {/* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
         New account
-      </Button>
+      </Button> */}
       <Drawer
         title="Create a new account"
         width={720}
