@@ -9,9 +9,10 @@ import RightDrawer from "../RightDrawer"
 const { Stencil } = Addon
 export default class VisRect extends React.Component {
   state = { //只有state里的值发生变化，才会重新渲染
-    open: false
+    open: false, //右侧抽屉是否打开
+    dataRightDrawer: {} //右侧抽屉表单返回的数据
   }
-  
+
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
@@ -33,13 +34,16 @@ export default class VisRect extends React.Component {
     //   console.log(e, x, y, node, view);
     // })
 
-    this.graph.on('cell:dblclick', ({ e, x, y, cell, view }) => {
+    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
       if (cell.label.slice(0, 5) === "Input") {
+        console.log(this.state.dataRightDrawer,6666)
+        this.setState({ open: true, dataRightDrawer: cell.data })
+        //
+        // console.log(cell.data)
+        // console.log(cell.label)
+        // console.log(cell.data)
+        // console.log(this.state.dataRightDrawer,1111111111)
 
-        this.setState({open:true}) 
-
-        console.log(cell.label)
-        console.log(cell.data)
       }
 
     })
@@ -86,7 +90,10 @@ export default class VisRect extends React.Component {
   render() {
     return (
       <div>
-        <RightDrawer open={this.state.open} setOpen={this.setOpen} />
+        <RightDrawer
+          open={this.state.open} setOpen={this.setOpen}
+          dataRightDrawer={this.state.dataRightDrawer} setDataRightDrawer={this.setDataRightDrawer}
+        />
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
           <div className="app-content" ref={this.refContainer} />
@@ -98,6 +105,18 @@ export default class VisRect extends React.Component {
   setOpen = (newState) => {
     this.setState({
       open: newState
+    })
+  }
+
+  setDataRightDrawer = (key,value) => {
+    console.log(key,value,11111)
+    const { dataRightDrawer } = this.state;
+    dataRightDrawer[key] = value
+
+    console.log(dataRightDrawer,222)
+    console.log(this.state,333)
+    this.setState({
+      dataRightDrawer: {...dataRightDrawer}
     })
   }
 

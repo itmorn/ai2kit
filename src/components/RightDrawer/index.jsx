@@ -1,78 +1,95 @@
-// import React, { useState } from 'react';
+// import  { useState } from 'react';
 // import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from 'antd';
-const { Option } = Select;
+import { Button, Col, Drawer, Form, Input, Row, Space } from 'antd';//Select,
+// const { Option } = Select;
 const App = (props) => {
-  console.log("first",props)
-  const {open, setOpen} = props
-  // const [open, setOpen] = useState(false);
+  // const [dataForm, setdataForm] = useState({});
+  const { open, setOpen, dataRightDrawer, setDataRightDrawer } = props
+  // setdataForm(dataRightDrawer)
   // const showDrawer = () => {
   //   setOpen(true);
   // };
   const onClose = () => {
     setOpen(false);
+    // setDataRightDrawer({ "a": 2 })
   };
+
+  const showElems = () => {
+    const { text } = dataRightDrawer
+    if (text.includes("Input1d")) { //输入标签
+      return (
+        <>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="channel"
+                initialValue={3}
+                label="channel"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter channel',
+                  },
+                ]}
+              >
+                <Input placeholder="Please enter channel"
+                  onChange={(e) => { setDataRightDrawer("channel",e.target.value) }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="Length"
+                initialValue={512}
+                label="Length"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter length',
+                  },
+                ]}
+              >
+                <Input placeholder="Please enter length" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </>
+      )
+    }
+
+    // if text.slice(0, 5) === "Input":
+    //   return
+
+  }
   return (
     <>
       {/* <Button type="primary" onClick={showDrawer} icon={<PlusOutlined />}>
         New account
       </Button> */}
       <Drawer
-        title="Create a new account"
+        title="修改数据"
         width={720}
         onClose={onClose}
         open={open}
         bodyStyle={{
           paddingBottom: 80,
         }}
-        extra={
-          <Space>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={onClose} type="primary">
-              Submit
-            </Button>
-          </Space>
-        }
+      // extra={
+      //   <Space>
+      //     <Button onClick={onClose}>Cancel</Button>
+      //     <Button onClick={onClose} type="primary">
+      //       Submit
+      //     </Button>
+      //   </Space>
+      // }
       >
-        <Form layout="vertical" hideRequiredMark>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="name"
-                label="Name"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please enter user name',
-                  },
-                ]}
-              >
-                <Input placeholder="Please enter user name" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="url"
-                label="Url"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please enter url',
-                  },
-                ]}
-              >
-                <Input
-                  style={{
-                    width: '100%',
-                  }}
-                  addonBefore="http://"
-                  addonAfter=".com"
-                  placeholder="Please enter url"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
+        <Form layout="vertical" hideRequiredMark
+        >
+          {showElems}
+          {/* <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="owner"
@@ -161,7 +178,7 @@ const App = (props) => {
                 <Input.TextArea rows={4} placeholder="please enter url description" />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </Drawer>
     </>
