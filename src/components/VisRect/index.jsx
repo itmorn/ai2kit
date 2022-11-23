@@ -32,14 +32,10 @@ export default class VisRect extends React.Component {
     this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
       if (cell.label.slice(0, 5) === "Input") {
         this.setState({ open: true, dataRightDrawer: cell.data }, () => {
-          console.log(this.state.dataRightDrawer)
+          // console.log(this.state.dataRightDrawer)
         })
-
-
       }
-
     })
-
 
     this.graph.centerContent()
 
