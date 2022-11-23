@@ -8,9 +8,9 @@ import RightDrawer from "../RightDrawer"
 
 const { Stencil } = Addon
 export default class VisRect extends React.Component {
-  state = { //只有state里的值发生变化，才会重新渲染
+  state = {
     open: false, //右侧抽屉是否打开
-    dataRightDrawer: {} //右侧抽屉表单返回的数据
+    dataRightDrawer: {} //点击Cell后，右侧抽屉表单展示当前Cell数据
   }
 
   componentDidMount() {
@@ -29,20 +29,12 @@ export default class VisRect extends React.Component {
       },
     })
 
-    // this.graph.on('cell:added', ({ e, x, y, node, view }) => {
-    //   console.log(this.graph.getCells());
-    //   console.log(e, x, y, node, view);
-    // })
-
     this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
       if (cell.label.slice(0, 5) === "Input") {
-        console.log(this.state.dataRightDrawer,6666)
-        this.setState({ open: true, dataRightDrawer: cell.data })
-        //
-        // console.log(cell.data)
-        // console.log(cell.label)
-        // console.log(cell.data)
-        // console.log(this.state.dataRightDrawer,1111111111)
+        this.setState({ open: true, dataRightDrawer: cell.data }, () => {
+          console.log(this.state.dataRightDrawer)
+        })
+
 
       }
 
@@ -108,15 +100,12 @@ export default class VisRect extends React.Component {
     })
   }
 
-  setDataRightDrawer = (key,value) => {
-    console.log(key,value,11111)
+  setDataRightDrawer = (key, value) => {
     const { dataRightDrawer } = this.state;
     dataRightDrawer[key] = value
 
-    console.log(dataRightDrawer,222)
-    console.log(this.state,333)
     this.setState({
-      dataRightDrawer: {...dataRightDrawer}
+      dataRightDrawer: { ...dataRightDrawer }
     })
   }
 

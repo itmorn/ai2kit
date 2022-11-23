@@ -10,7 +10,7 @@ export const Input1d = new Rect({
         text: { text: 'Input1d', fill: 'white' },
     },
     data:{
-        "channel":3,"length":224,"text":'Input1d'
+        "channel":3,"length":512,"text":'Input1d'
     }
 })
 export const Input2d = new Rect({
