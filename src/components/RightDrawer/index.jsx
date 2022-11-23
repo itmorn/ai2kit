@@ -1,14 +1,37 @@
-import { Col, Drawer, Form, Input, Row } from 'antd';//Select,
+// import { useEffect } from 'react'
+import { Col, Drawer, Form, Input, Row } from 'antd';
+
+
 const App = (props) => {
+  const [form] = Form.useForm()
   const { open, setOpen, dataRightDrawer, setDataRightDrawer } = props
+
+  // 生命周期函数：挂载、更新、卸载
+  // 更新
+  // useEffect(() => {
+  //   setFieldValue()
+  // }, [dataRightDrawer]) //所有更新都执行    
+
+  // const setFieldValue = () => {
+  //   const { Channel } = dataRightDrawer;
+  //   form.setFieldsValue({
+  //     Channel: Channel
+  //   });
+  // }
+
+  const onClose = (e) => {
+    setOpen(false);
+    form.resetFields();
+  }
 
   const showElems = () => {
     const { Text } = dataRightDrawer
-    console.log(Text,"showElems")
     if (Text.includes("Input")) {//输入标签
       const { Channel, Length, Height, Width, Dimension } = dataRightDrawer
+
       let ChannelView = ""; let LengthView = ""; let HeightView = ""; let DimensionView = "";
       if (Channel) {
+        // console.log(111111111111111, Channel);
         ChannelView =
           <Row gutter={16}>
             <Col span={12}>
@@ -149,14 +172,15 @@ const App = (props) => {
       <Drawer
         title="修改数据"
         width={720}
-        onClose={() => setOpen(false)}
+        onClose={onClose}
         open={open}
         bodyStyle={{
           paddingBottom: 80,
         }}
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form layout="vertical" hideRequiredMark form={form}>
           {showElems}
+          {/* {open?showElems:''} */}
         </Form>
       </Drawer>
     </>
