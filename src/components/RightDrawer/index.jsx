@@ -1,4 +1,4 @@
-// import { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Col, Drawer, Form, Input, Row } from 'antd';
 
 
@@ -6,22 +6,15 @@ const App = (props) => {
   const [form] = Form.useForm()
   const { open, setOpen, dataRightDrawer, setDataRightDrawer } = props
 
-  // 生命周期函数：挂载、更新、卸载
-  // 更新
-  // useEffect(() => {
-  //   setFieldValue()
-  // }, [dataRightDrawer]) //所有更新都执行    
 
-  // const setFieldValue = () => {
-  //   const { Channel } = dataRightDrawer;
-  //   form.setFieldsValue({
-  //     Channel: Channel
-  //   });
-  // }
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+    }
+  }, [open, form])
 
   const onClose = (e) => {
     setOpen(false);
-    form.resetFields();
   }
 
   const showElems = () => {
@@ -31,7 +24,6 @@ const App = (props) => {
 
       let ChannelView = ""; let LengthView = ""; let HeightView = ""; let DimensionView = "";
       if (Channel) {
-        // console.log(111111111111111, Channel);
         ChannelView =
           <Row gutter={16}>
             <Col span={12}>

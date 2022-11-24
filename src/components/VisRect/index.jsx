@@ -13,6 +13,8 @@ export default class VisRect extends React.Component {
     dataRightDrawer: {} //点击Cell后，右侧抽屉表单展示当前Cell数据
   }
 
+  curCell = "" //当前所操作的Cell的引用
+
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
@@ -30,10 +32,9 @@ export default class VisRect extends React.Component {
     })
 
     this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
+      this.curCell = cell //将当前Cell的引用 保存到 curCell
       if (cell.label.slice(0, 5) === "Input") {
-        console.log("cell:click  before setState",cell.data)
         this.setState({ open: true, dataRightDrawer: cell.data }, () => {
-          console.log("cell:click  after setState",cell.data)
         })
       }
     })
@@ -98,14 +99,14 @@ export default class VisRect extends React.Component {
   }
 
   setDataRightDrawer = (key, value) => {
-    console.log("setDataRightDrawer",key,value)
     const { dataRightDrawer } = this.state;
     dataRightDrawer[key] = value
 
     this.setState({
       dataRightDrawer: { ...dataRightDrawer }
+    }, () => {
+      this.curCell.data = this.state.dataRightDrawer
     })
-    console.log("dataRightDrawer",dataRightDrawer)
   }
 
 }
