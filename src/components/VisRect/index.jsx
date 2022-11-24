@@ -10,7 +10,8 @@ const { Stencil } = Addon
 export default class VisRect extends React.Component {
   state = {
     open: false, //右侧抽屉是否打开
-    dataRightDrawer: {} //点击Cell后，右侧抽屉表单展示当前Cell数据
+    dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
+    showNodeInfo: false, //显示结点详情
   }
 
   curCell = "" //当前所操作的Cell的引用
@@ -31,6 +32,7 @@ export default class VisRect extends React.Component {
       },
     })
 
+    //点cell 打开右侧抽屉
     this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
       this.curCell = cell //将当前Cell的引用 保存到 curCell
       if (cell.label.slice(0, 5) === "Input") {
@@ -59,15 +61,12 @@ export default class VisRect extends React.Component {
       ],
     })
 
-
     this.stencilContainer.appendChild(stencil.container)
-
 
     stencil.load([Input1d, Input2d, Input3d], 'Input')
     stencil.load([Conv, ConvTranspose], 'Conv')
     stencil.load([MaxPool], 'Pool')
   }
-
   refContainer = (container) => {
     this.container = container
   }
@@ -76,10 +75,38 @@ export default class VisRect extends React.Component {
     this.stencilContainer = container
   }
 
+  // 展开/关闭 抽屉
+  setOpen = (newState) => {
+    this.setState({
+      open: newState
+    })
+  }
+  //设置抽屉数据，并更新到cell上
+  setDataRightDrawer = (key, value) => {
+    const { dataRightDrawer } = this.state;
+    dataRightDrawer[key] = value
+
+    this.setState({
+      dataRightDrawer: { ...dataRightDrawer }
+    }, () => {
+      this.curCell.data = this.state.dataRightDrawer
+    })
+  }
+
+  // 复选框——显示结点详情
+  showNodeInfo = (e) => {
+    // 遍历每个结点
+    this.setState({
+      showNodeInfo: !this.state.showNodeInfo
+    })
+    console.log(e.target,this.graph);
+  }
 
   render() {
     return (
       <div>
+        <input type="text" readOnly={true} value={this.state.showNodeInfo} />
+        <input type="checkbox" defaultChecked={this.state.showNodeInfo} onClick={this.showNodeInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
           dataRightDrawer={this.state.dataRightDrawer} setDataRightDrawer={this.setDataRightDrawer}
@@ -92,21 +119,5 @@ export default class VisRect extends React.Component {
     )
   }
 
-  setOpen = (newState) => {
-    this.setState({
-      open: newState
-    })
-  }
-
-  setDataRightDrawer = (key, value) => {
-    const { dataRightDrawer } = this.state;
-    dataRightDrawer[key] = value
-
-    this.setState({
-      dataRightDrawer: { ...dataRightDrawer }
-    }, () => {
-      this.curCell.data = this.state.dataRightDrawer
-    })
-  }
-
+  
 }
