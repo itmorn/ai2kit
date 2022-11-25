@@ -11,7 +11,7 @@ export default class VisRect extends React.Component {
   state = {
     open: false, //右侧抽屉是否打开
     dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
-    showNodeInfo: false, //显示结点详情
+    showNodeMoreInfo: true, //显示结点详情
   }
 
   curCell = "" //当前所操作的Cell的引用
@@ -94,19 +94,24 @@ export default class VisRect extends React.Component {
   }
 
   // 复选框——显示结点详情
-  showNodeInfo = (e) => {
+  showNodeMoreInfo = (e) => {
     // 遍历每个结点
+    console.log(111, e.target, this.graph.getCells());
+    const cells = this.graph.getCells()
+    cells.forEach(cell => { cell.visible = !this.state.showNodeMoreInfo })
+
+
     this.setState({
-      showNodeInfo: !this.state.showNodeInfo
+      showNodeMoreInfo: !this.state.showNodeMoreInfo
     })
-    console.log(e.target,this.graph);
+
   }
 
   render() {
     return (
       <div>
-        <input type="text" readOnly={true} value={this.state.showNodeInfo} />
-        <input type="checkbox" defaultChecked={this.state.showNodeInfo} onClick={this.showNodeInfo} />显示结点详情
+        <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} />
+        <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.showNodeMoreInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
           dataRightDrawer={this.state.dataRightDrawer} setDataRightDrawer={this.setDataRightDrawer}
@@ -119,5 +124,5 @@ export default class VisRect extends React.Component {
     )
   }
 
-  
+
 }
