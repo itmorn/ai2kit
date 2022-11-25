@@ -10,11 +10,10 @@ const { Stencil } = Addon
 export default class VisRect extends React.Component {
   state = {
     open: false, //右侧抽屉是否打开
-    dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
+    // dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
+    curCell: {}, //当前cell的引用
     showNodeMoreInfo: true, //显示结点详情
   }
-
-  curCell = "" //当前所操作的Cell的引用
 
   componentDidMount() {
     this.graph = new Graph({
@@ -35,12 +34,8 @@ export default class VisRect extends React.Component {
 
     //点cell 打开右侧抽屉
     this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
-      this.curCell = cell //将当前Cell的引用 保存到 curCell
       if (cell.label.slice(0, 5) === "Input") {
-        this.setState({ open: true, dataRightDrawer: cell.data }, () => {
-          // 更新结点的label
-          this.showNodeMoreInfo(cell)
-        })
+        this.setState({ open: true, curCell: cell }) // 打开抽屉，并把当前cell的引用传过去
       }
     })
 
@@ -89,16 +84,12 @@ export default class VisRect extends React.Component {
       open: newState
     })
   }
-  //设置抽屉数据，并更新到cell上
-  setDataRightDrawer = (key, value) => {
-    const { dataRightDrawer } = this.state;
-    dataRightDrawer[key] = value
 
-    this.setState({
-      dataRightDrawer: { ...dataRightDrawer }
-    }, () => {
-      this.curCell.data = this.state.dataRightDrawer
-    })
+  //设置抽屉数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
+  setCurCellData = (key, value) => {
+    const CurCellRef = this.state.curCell
+    CurCellRef.data[key] = value
+    this.showNodeMoreInfo(CurCellRef) 
   }
 
   // 复选框——显示结点详情
@@ -115,6 +106,7 @@ export default class VisRect extends React.Component {
     })
   }
 
+  // 根据cell的引用直接修改cell的值，并自动重新渲染
   showNodeMoreInfo(cell) {
     if (this.state.showNodeMoreInfo) {
       console.log(111)
@@ -146,7 +138,7 @@ export default class VisRect extends React.Component {
         <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
-          dataRightDrawer={this.state.dataRightDrawer} setDataRightDrawer={this.setDataRightDrawer}
+          curCell={this.state.curCell} setCurCell={this.setCurCellData}
         />
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />

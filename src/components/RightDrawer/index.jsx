@@ -4,7 +4,7 @@ import { Col, Drawer, Form, Input, Row } from 'antd';
 let numShouldGreater0=1;
 const App = (props) => {
   const [form] = Form.useForm()
-  const { open, setOpen, dataRightDrawer, setDataRightDrawer } = props
+  const { open, setOpen, curCell, setCurCell: setCurCellData } = props
   
   useEffect(() => {
     if (open) {
@@ -20,9 +20,9 @@ const App = (props) => {
     setOpen(false);
   }
   const showElems = () => {
-    const { Text } = dataRightDrawer
+    const Text  = curCell.data.Text
     if (Text.includes("Input")) {//输入标签
-      const { Channel, Length, Height, Width, Dimension } = dataRightDrawer
+      const { Channel, Length, Height, Width, Dimension } = curCell.data
       let ChannelView =
         <Row gutter={16}>
           <Col span={12}>
@@ -40,7 +40,7 @@ const App = (props) => {
               <Input type="number" placeholder="Please enter Channel"
                 onChange={(e) => { 
                   numShouldGreater0=e.target.value
-                  setDataRightDrawer("Channel",numShouldGreater0*1) 
+                  setCurCellData("Channel",numShouldGreater0*1) 
                 }}
               />
             </Form.Item>
@@ -63,7 +63,7 @@ const App = (props) => {
               <Input placeholder="Please enter Length"
                 onChange={(e) => { 
                   numShouldGreater0=e.target.value
-                  setDataRightDrawer("Length",numShouldGreater0*1) 
+                  setCurCellData("Length",numShouldGreater0*1) 
                 }}
               />
             </Form.Item>
@@ -86,7 +86,7 @@ const App = (props) => {
               <Input placeholder="Please enter Height"
                 onChange={(e) => { 
                   numShouldGreater0=e.target.value
-                  setDataRightDrawer("Height",numShouldGreater0*1) 
+                  setCurCellData("Height",numShouldGreater0*1) 
                 }}
               />
             </Form.Item>
@@ -104,7 +104,7 @@ const App = (props) => {
               ]}
             >
               <Input placeholder="Please enter Width"
-                onChange={(e) => { setDataRightDrawer("Width", e.target.value * 1) }}
+                onChange={(e) => { setCurCellData("Width", e.target.value * 1) }}
               />
             </Form.Item>
           </Col>
@@ -126,7 +126,7 @@ const App = (props) => {
               <Input placeholder="Please enter Dimension"
                 onChange={(e) => { 
                   numShouldGreater0=e.target.value
-                  setDataRightDrawer("Dimension",numShouldGreater0*1) 
+                  setCurCellData("Dimension",numShouldGreater0*1) 
                 }}
               />
             </Form.Item>
