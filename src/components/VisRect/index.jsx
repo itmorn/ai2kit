@@ -20,6 +20,7 @@ export default class VisRect extends React.Component {
     this.graph = new Graph({
       container: this.container,
       grid: true,
+      // resizing: true,
       snapline: {
         enabled: true,
         sharp: true,
@@ -37,8 +38,15 @@ export default class VisRect extends React.Component {
       this.curCell = cell //将当前Cell的引用 保存到 curCell
       if (cell.label.slice(0, 5) === "Input") {
         this.setState({ open: true, dataRightDrawer: cell.data }, () => {
+          // 更新结点的label
+          this.showNodeMoreInfo(cell)
         })
       }
+    })
+
+    //添加cell时，显示结点详情
+    this.graph.on('node:added', ({ e, x, y, cell, view }) => {
+      this.showNodeMoreInfo(cell)
     })
 
     this.graph.centerContent()
@@ -94,24 +102,48 @@ export default class VisRect extends React.Component {
   }
 
   // 复选框——显示结点详情
-  showNodeMoreInfo = (e) => {
-    // 遍历每个结点
-    console.log(111, e.target, this.graph.getCells());
-    const cells = this.graph.getCells()
-    cells.forEach(cell => { cell.visible = !this.state.showNodeMoreInfo })
-
-
+  changeNodeMoreInfo = (e) => {
     this.setState({
       showNodeMoreInfo: !this.state.showNodeMoreInfo
+    }, () => {
+      // 遍历每个结点
+      const cells = this.graph.getCells()
+      // cells.forEach(cell => { cell.visible = !this.state.showNodeMoreInfo })
+      cells.forEach(cell => {
+        this.showNodeMoreInfo(cell)
+      })
     })
+  }
 
+  showNodeMoreInfo(cell) {
+    if (this.state.showNodeMoreInfo) {
+      console.log(111)
+      let label = cell.data.Text + "\n"
+      let heightNew = 1
+      let widthNew = label.length
+      for (let key in cell.data) {
+        if ("Text" === key)
+          continue
+        let line = "\n" + key + ": " + cell.data[key]
+        label += line
+        heightNew += 1
+        widthNew = Math.max(widthNew, line.length)
+      }
+      cell.label = label
+      cell.resize(widthNew * 10, 40 + heightNew * 12)
+    }
+    else {
+      console.log(222)
+      cell.label = cell.data.Text
+      cell.resize(cell.label.length * 10, 40)
+    }
   }
 
   render() {
     return (
       <div>
         <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} />
-        <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.showNodeMoreInfo} />显示结点详情
+        <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
           dataRightDrawer={this.state.dataRightDrawer} setDataRightDrawer={this.setDataRightDrawer}
