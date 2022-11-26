@@ -1,5 +1,6 @@
 import React from 'react'
 import { Graph, Addon } from '@antv/x6'
+import { Button } from 'antd'
 import './index.css'
 import { Conv, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
@@ -13,11 +14,15 @@ export default class VisRect extends React.Component {
     // dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
     curCell: {}, //当前cell的引用
     showNodeMoreInfo: false, //显示结点详情
+    canRedo: false,
+    canUndo: false,
   }
 
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
+      width:1510,
+      // height:2000,
       grid: true,
       // resizing: true,
       selecting: {
@@ -30,11 +35,16 @@ export default class VisRect extends React.Component {
         sharp: true,
       },
       scroller: {
-        // enabled: true,
+        enabled: true,
         pageVisible: false,
         pageBreak: false,
-        pannable: true,
+        // pannable: true,
       },
+      minimap: {
+        enabled: true,
+        container: this.minimapContainer,
+      },
+      history: true,
     })
 
     //点cell 打开右侧抽屉
@@ -56,7 +66,15 @@ export default class VisRect extends React.Component {
     //   this.graph.removeCell(cell)
     // })
 
-    this.graph.centerContent()
+    // this.graph.centerContent()
+
+    this.history = this.graph.history
+    this.history.on('change', () => {
+      this.setState({
+        canRedo: this.history.canRedo(),
+        canUndo: this.history.canUndo(),
+      })
+    })
 
     const stencil = new Stencil({
       title: '基础模块',
@@ -89,6 +107,9 @@ export default class VisRect extends React.Component {
   refStencil = (container) => {
     this.stencilContainer = container
   }
+  refMiniMapContainer = (container) => {
+    this.minimapContainer = container
+  }
 
   // 展开/关闭 抽屉
   setOpen = (newState) => {
@@ -101,7 +122,7 @@ export default class VisRect extends React.Component {
   setCurCellData = (key, value) => {
     const CurCellRef = this.state.curCell
     CurCellRef.data[key] = value
-    this.showNodeMoreInfo(CurCellRef) 
+    this.showNodeMoreInfo(CurCellRef)
   }
 
   // 复选框——显示结点详情
@@ -141,18 +162,44 @@ export default class VisRect extends React.Component {
     }
   }
 
+
+  onUndo = () => {
+    this.history.undo()
+  }
+
+  onRedo = () => {
+    this.history.redo()
+  }
   render() {
     return (
-      <div>
+      <div >
         {/* <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} /> */}
-        <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
           curCell={this.state.curCell} setCurCell={this.setCurCellData}
         />
+        <div style={{ "display": "flex" }}>
+          <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
+          &nbsp;&nbsp;
+          <div className="app-btns">
+            <Button.Group>
+              <Button onClick={this.onUndo} disabled={!this.state.canUndo}>
+                Undo
+              </Button>
+              <Button onClick={this.onRedo} disabled={!this.state.canRedo}>
+                Redo
+              </Button>
+            </Button.Group>
+          </div>
+        </div>
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
           <div className="app-content" ref={this.refContainer} />
+          <div style={{ "align-items": "center" }}>
+            <textarea type="text" defaultValue={"aaa"}/>
+            <br /><br /><br />
+            <div className="app-minimap" ref={this.refMiniMapContainer} />
+          </div>
         </div>
       </div>
     )
