@@ -5,15 +5,16 @@ import './index.css'
 import { Conv, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
 import { MaxPool } from './blocks/pool'
-import RightDrawer from "../RightDrawer"
+// import RightDrawer from "../RightDrawer"
+import RightPannel from "../RightPannel"
 
 const { Stencil } = Addon
 export default class VisRect extends React.Component {
   state = {
     open: false, //右侧抽屉是否打开
     // dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
-    curCell: {}, //当前cell的引用
-    showNodeMoreInfo: false, //显示结点详情
+    curCell: "", //当前cell的引用
+    showNodeMoreInfo: true, //显示结点详情
     canRedo: false,
     canUndo: false,
   }
@@ -48,7 +49,15 @@ export default class VisRect extends React.Component {
     })
 
     //点cell 打开右侧抽屉
-    this.graph.on('cell:dblclick', ({ e, x, y, cell, view }) => {
+    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
+      console.log(1111,this.graph.getSelectedCells())
+
+      if (this.graph.getSelectedCells().length>1){ //如果选中多个node 则清空curCell引用
+        this.setState({
+          curCell: ""
+        })
+        return
+      }
       if (cell.label.slice(0, 5) === "Input") {
         this.setState({ open: true, curCell: cell }) // 打开抽屉，并把当前cell的引用传过去
       }
@@ -59,14 +68,20 @@ export default class VisRect extends React.Component {
       this.showNodeMoreInfo(cell)
     })
 
-    // // 选中cell
-    // this.graph.on('cell:selected', ({cell,options}) => { 
-    //   console.log(cell)
-    //   // code here
-    //   this.graph.removeCell(cell)
-    // })
+    //点击画布时，curCell引用指向空
+    this.graph.on('blank:click', () => {
+      this.setState({
+        curCell: ""
+      })
+    })
 
-    // this.graph.centerContent()
+    // 选中cell
+    this.graph.on('cell:selected', ({ cell, options }) => {
+      console.log("选中cell",this.graph.getSelectedCells())
+      // code here
+      // this.graph.removeCell(cell)
+    })
+
 
     this.history = this.graph.history
     this.history.on('change', () => {
@@ -174,10 +189,10 @@ export default class VisRect extends React.Component {
     return (
       <div >
         {/* <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} /> */}
-        <RightDrawer
+        {/* <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
           curCell={this.state.curCell} setCurCell={this.setCurCellData}
-        />
+        /> */}
         <div style={{ "display": "flex" }}>
           <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
           &nbsp;&nbsp;
@@ -195,11 +210,12 @@ export default class VisRect extends React.Component {
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
           <div className="app-content" ref={this.refContainer} />
-          <div  ref={this.refMiniMapContainer} style={{ position: "absolute",left:1400,bottom:-150}} />
-
-          <div style={{ "align-items": "center" }}>
-            <textarea type="text" defaultValue={"aaa"} />
-            <hr /><br /><br />
+          <div ref={this.refMiniMapContainer} style={{ position: "absolute", left: 1400, bottom: -150 }} />
+          <div style={{ alignItems: "center" }} width={100}>
+            {/* <textarea type="text" defaultValue={"aaa"} /> */}
+            <RightPannel
+              curCell={this.state.curCell} setCurCell={this.setCurCellData}
+            />
           </div>
         </div>
       </div>
