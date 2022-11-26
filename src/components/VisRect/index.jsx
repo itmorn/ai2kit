@@ -5,14 +5,11 @@ import './index.css'
 import { Conv, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
 import { MaxPool } from './blocks/pool'
-// import RightDrawer from "../RightDrawer"
 import RightPannel from "../RightPannel"
 
 const { Stencil } = Addon
 export default class VisRect extends React.Component {
   state = {
-    open: false, //右侧抽屉是否打开
-    // dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
     curCell: "", //当前cell的引用
     showNodeMoreInfo: true, //显示结点详情
     canRedo: false,
@@ -30,6 +27,9 @@ export default class VisRect extends React.Component {
         enabled: true,
         rubberband: true, // 启用框选
         showNodeSelectionBox: true,
+        multiple: false,
+        multipleSelectionModifiers: ['alt'],
+        modifiers: null,
       },
       snapline: {
         enabled: true,
@@ -48,18 +48,95 @@ export default class VisRect extends React.Component {
       history: true,
     })
 
-    //点cell 打开右侧抽屉
-    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
-      console.log(1111,this.graph.getSelectedCells())
+    // this.graph.on('blank:mouseup', ({ e, x, y, cell, view }) => {
+    //   console.log('blank:mouseup当前选中的结点有',this.graph.getSelectedCells())
+    // })
 
-      if (this.graph.getSelectedCells().length>1){ //如果选中多个node 则清空curCell引用
-        this.setState({
-          curCell: ""
-        })
-        return
+
+    this.graph.on('cell:mousedown', ({ e, x, y, cell, view }) => {
+      // 1.选区为空时：
+      //            1.1.mousedown 没选中的结点 => 选中
+      // 2.选区不为空时：
+      //            2.1.mousedown 选中的结点 => 不变
+      //            2.2.mousedown 没选中的结点 => 选区清空，选中
+      if (this.graph.getSelectedCells().length === 0) { //1.选区为空时：
+        this.graph.select(cell) //1.1.mousedown 没选中的结点 => 选中
+      }
+      else { //2.选区不为空时：
+        if (this.graph.isSelected(cell)) {// 2.1.mousedown 选中的结点 => 不变
+          console.log(this.graph.getSelectedCells())
+          this.graph.disableSelection()
+          return
+        } else { //2.2.mousedown 没选中的结点 => 选区清空，选中
+          this.graph.cleanSelection()
+          this.graph.select(cell)
+        }
+
+
+        //   if (e.ctrlKey) { //按下ctrlKey
+        //     // console.log(111,this.graph.getSelectedCells())
+        //     // console.log(555,this.graph.isSelected(cell))
+
+        //     console.log("2当前选中的结点有：", this.graph.getSelectedCells())
+        //     console.log("当前选中的结点为：", cell)
+        //     console.log(this.graph.isSelected(cell))
+        //     if (this.graph.isSelected(cell)) { //如果是已选中的  则减去该结点
+        //       console.log("选的是已选中的")
+        //       this.graph.unselect(cell)
+        //     }
+        //     else { //如果不是已选中的  则增加该结点
+        //       console.log("选的不是已选中的")
+        //       this.graph.select(cell)
+        //     }
+        //     // console.log(444,this.graph.getSelectedCells())
+        //     //只要是按下ctrlKey进行点击 就关闭弹窗
+        //     this.setState({
+        //       curCell: ""
+        //     })
+        //     console.log("out", this.graph.getSelectedCells())
+        //     return
+        //   }
+        //   else { //没按 ctrl
+        //     //如果选的是已经被选中的
+        //     if (this.graph.isSelected(cell)) { //如果是已选中的  则不动
+        //       return
+        //     }
+        //     else { //如果选了一个没被选中的，则清空选区选中该结点
+        //       this.graph.cleanSelection()
+        //       this.graph.select(cell)
+        //     }
+        //   }
+        // }
       }
       if (cell.label.slice(0, 5) === "Input") {
-        this.setState({ open: true, curCell: cell }) // 打开抽屉，并把当前cell的引用传过去
+        this.setState({ curCell: cell }, () => {
+        })
+      }
+    })
+
+    this.graph.on('cell:mouseup', ({ e, x, y, cell, view }) => {
+      this.graph.enableSelection() 
+      console.log("enter mouseup",this.graph.getSelectedCells())
+    })
+    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
+      console.log("enter click",this.graph.getSelectedCells())
+      // 1.选区为空时：
+      //            1.1.click 没选中的结点 => 选中
+      // 2.选区不为空时：
+      //            2.1.mousedown 选中的结点 => 不变
+      //            2.2.mousedown 没选中的结点 => 选区清空，选中
+      if (this.graph.getSelectedCells().length === 0) { //1.选区为空时：
+        this.graph.select(cell) //1.1.mousedown 没选中的结点 => 选中
+      }
+      else { //2.选区不为空时：
+        if (this.graph.isSelected(cell)) {// 2.1.mousedown 选中的结点 => 不变
+          console.log(this.graph.getSelectedCells())
+          return
+        } else { //2.2.mousedown 没选中的结点 => 选区清空，选中
+          this.graph.cleanSelection()
+          this.graph.select(cell)
+        }
+
       }
     })
 
@@ -69,18 +146,22 @@ export default class VisRect extends React.Component {
     })
 
     //点击画布时，curCell引用指向空
-    this.graph.on('blank:click', () => {
+    this.graph.on('blank:mousedown', () => {
       this.setState({
         curCell: ""
       })
     })
 
-    // 选中cell
-    this.graph.on('cell:selected', ({ cell, options }) => {
-      console.log("选中cell",this.graph.getSelectedCells())
-      // code here
-      // this.graph.removeCell(cell)
-    })
+    // // 选中cell
+    // this.graph.on('cell:mousedown', ({ cell, options }) => {
+    //   this.graph.resetSelection()
+    //   console.log("resetSelection",this.graph.getSelectedCells())
+    // })
+
+    // // 选中cell
+    // this.graph.on('cell:selected', ({ cell, options }) => {
+    //   console.log("选中cell",this.graph.getSelectedCells())
+    // })
 
 
     this.history = this.graph.history
@@ -124,13 +205,6 @@ export default class VisRect extends React.Component {
   }
   refMiniMapContainer = (container) => {
     this.minimapContainer = container
-  }
-
-  // 展开/关闭 抽屉
-  setOpen = (newState) => {
-    this.setState({
-      open: newState
-    })
   }
 
   //设置抽屉数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
@@ -185,14 +259,11 @@ export default class VisRect extends React.Component {
   onRedo = () => {
     this.history.redo()
   }
+
+
   render() {
     return (
       <div >
-        {/* <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} /> */}
-        {/* <RightDrawer
-          open={this.state.open} setOpen={this.setOpen}
-          curCell={this.state.curCell} setCurCell={this.setCurCellData}
-        /> */}
         <div style={{ "display": "flex" }}>
           <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
           &nbsp;&nbsp;
@@ -212,7 +283,6 @@ export default class VisRect extends React.Component {
           <div className="app-content" ref={this.refContainer} />
           <div ref={this.refMiniMapContainer} style={{ position: "absolute", left: 1400, bottom: -150 }} />
           <div style={{ alignItems: "center" }} width={100}>
-            {/* <textarea type="text" defaultValue={"aaa"} /> */}
             <RightPannel
               curCell={this.state.curCell} setCurCell={this.setCurCellData}
             />
