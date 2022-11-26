@@ -21,7 +21,7 @@ export default class VisRect extends React.Component {
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
-      width:1510,
+      width: 1510,
       // height:2000,
       grid: true,
       // resizing: true,
@@ -195,10 +195,11 @@ export default class VisRect extends React.Component {
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
           <div className="app-content" ref={this.refContainer} />
+          <div  ref={this.refMiniMapContainer} style={{ position: "absolute",left:1400,bottom:-150}} />
+
           <div style={{ "align-items": "center" }}>
-            <textarea type="text" defaultValue={"aaa"}/>
-            <br /><br /><br />
-            <div className="app-minimap" ref={this.refMiniMapContainer} />
+            <textarea type="text" defaultValue={"aaa"} />
+            <hr /><br /><br />
           </div>
         </div>
       </div>
