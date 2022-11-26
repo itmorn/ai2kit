@@ -12,7 +12,7 @@ export default class VisRect extends React.Component {
     open: false, //右侧抽屉是否打开
     // dataRightDrawer: {}, //点击Cell后，右侧抽屉表单展示当前Cell数据
     curCell: {}, //当前cell的引用
-    showNodeMoreInfo: true, //显示结点详情
+    showNodeMoreInfo: false, //显示结点详情
   }
 
   componentDidMount() {
@@ -20,12 +20,17 @@ export default class VisRect extends React.Component {
       container: this.container,
       grid: true,
       // resizing: true,
+      selecting: {
+        enabled: true,
+        rubberband: true, // 启用框选
+        showNodeSelectionBox: true,
+      },
       snapline: {
         enabled: true,
         sharp: true,
       },
       scroller: {
-        enabled: true,
+        // enabled: true,
         pageVisible: false,
         pageBreak: false,
         pannable: true,
@@ -33,7 +38,7 @@ export default class VisRect extends React.Component {
     })
 
     //点cell 打开右侧抽屉
-    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
+    this.graph.on('cell:dblclick', ({ e, x, y, cell, view }) => {
       if (cell.label.slice(0, 5) === "Input") {
         this.setState({ open: true, curCell: cell }) // 打开抽屉，并把当前cell的引用传过去
       }
@@ -43,6 +48,13 @@ export default class VisRect extends React.Component {
     this.graph.on('node:added', ({ e, x, y, cell, view }) => {
       this.showNodeMoreInfo(cell)
     })
+
+    // // 选中cell
+    // this.graph.on('cell:selected', ({cell,options}) => { 
+    //   console.log(cell)
+    //   // code here
+    //   this.graph.removeCell(cell)
+    // })
 
     this.graph.centerContent()
 
@@ -109,9 +121,8 @@ export default class VisRect extends React.Component {
   // 根据cell的引用直接修改cell的值，并自动重新渲染
   showNodeMoreInfo(cell) {
     if (this.state.showNodeMoreInfo) {
-      console.log(111)
-      let label = cell.data.Text + "\n"
-      let heightNew = 1
+      let label = cell.data.Text
+      let heightNew = 0
       let widthNew = label.length
       for (let key in cell.data) {
         if ("Text" === key)
@@ -125,7 +136,6 @@ export default class VisRect extends React.Component {
       cell.resize(widthNew * 10, 40 + heightNew * 12)
     }
     else {
-      console.log(222)
       cell.label = cell.data.Text
       cell.resize(cell.label.length * 10, 40)
     }
@@ -134,7 +144,7 @@ export default class VisRect extends React.Component {
   render() {
     return (
       <div>
-        <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} />
+        {/* <input type="text" readOnly={true} value={this.state.showNodeMoreInfo} /> */}
         <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
         <RightDrawer
           open={this.state.open} setOpen={this.setOpen}
