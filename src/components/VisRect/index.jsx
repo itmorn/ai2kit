@@ -15,7 +15,7 @@ export default class VisRect extends React.Component {
     canRedo: false,
     canUndo: false,
   }
-
+  flagNewCell = "" //指向选取非空，按住ctrl所点击的 未选择的节点
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
@@ -27,8 +27,9 @@ export default class VisRect extends React.Component {
         enabled: true,
         rubberband: true, // 启用框选
         showNodeSelectionBox: true,
-        multiple: false,
-        multipleSelectionModifiers: ['alt'],
+        multiple: true,
+        strict: true,
+        multipleSelectionModifiers: ['123'],
         modifiers: null,
       },
       snapline: {
@@ -48,96 +49,107 @@ export default class VisRect extends React.Component {
       history: true,
     })
 
-    // this.graph.on('blank:mouseup', ({ e, x, y, cell, view }) => {
-    //   console.log('blank:mouseup当前选中的结点有',this.graph.getSelectedCells())
-    // })
-
-
     this.graph.on('cell:mousedown', ({ e, x, y, cell, view }) => {
       // 1.选区为空时：
-      //            1.1.mousedown 没选中的结点 => 选中
+      //    1.1.按住ctrl
+      //      1.1.1. mousedown 没选中的结点 => 选中
+      //    1.2.没按住ctrl
+      //      1.2.1. mousedown 没选中的结点 => 选中
+      //  1.1.mousedown 没选中的结点 => ①选中  ②选中(ctrl)
       // 2.选区不为空时：
-      //            2.1.mousedown 选中的结点 => 不变
-      //            2.2.mousedown 没选中的结点 => 选区清空，选中
-      if (this.graph.getSelectedCells().length === 0) { //1.选区为空时：
-        this.graph.select(cell) //1.1.mousedown 没选中的结点 => 选中
-      }
-      else { //2.选区不为空时：
-        if (this.graph.isSelected(cell)) {// 2.1.mousedown 选中的结点 => 不变
-          console.log(this.graph.getSelectedCells())
-          this.graph.disableSelection()
-          return
-        } else { //2.2.mousedown 没选中的结点 => 选区清空，选中
-          this.graph.cleanSelection()
+      //    2.1.按住ctrl
+      //      2.1.1. mousedown 没选中的结点 => 添加选中，隐藏面板
+      //      2.1.2. mousedown 选中的结点 => 不变，交给click剔除掉选中的结点(ctrl)
+      //    2.2.没按住ctrl
+      //      2.2.1. mousedown 没选中的结点 => 选区清空，再选中
+      //      2.2.2. mousedown 选中的结点 => 不变
+
+      // 1.选区为空时：
+      if (this.graph.getSelectedCells().length === 0) {
+        // 1.选区为空时： 1.1.按住ctrl  1.1.1. mousedown 没选中的结点 => 选中
+        if (e.ctrlKey) {
           this.graph.select(cell)
+          this.setState({ curCell: cell })
+          this.flagNewCell = cell
         }
-
-
-        //   if (e.ctrlKey) { //按下ctrlKey
-        //     // console.log(111,this.graph.getSelectedCells())
-        //     // console.log(555,this.graph.isSelected(cell))
-
-        //     console.log("2当前选中的结点有：", this.graph.getSelectedCells())
-        //     console.log("当前选中的结点为：", cell)
-        //     console.log(this.graph.isSelected(cell))
-        //     if (this.graph.isSelected(cell)) { //如果是已选中的  则减去该结点
-        //       console.log("选的是已选中的")
-        //       this.graph.unselect(cell)
-        //     }
-        //     else { //如果不是已选中的  则增加该结点
-        //       console.log("选的不是已选中的")
-        //       this.graph.select(cell)
-        //     }
-        //     // console.log(444,this.graph.getSelectedCells())
-        //     //只要是按下ctrlKey进行点击 就关闭弹窗
-        //     this.setState({
-        //       curCell: ""
-        //     })
-        //     console.log("out", this.graph.getSelectedCells())
-        //     return
-        //   }
-        //   else { //没按 ctrl
-        //     //如果选的是已经被选中的
-        //     if (this.graph.isSelected(cell)) { //如果是已选中的  则不动
-        //       return
-        //     }
-        //     else { //如果选了一个没被选中的，则清空选区选中该结点
-        //       this.graph.cleanSelection()
-        //       this.graph.select(cell)
-        //     }
-        //   }
-        // }
+        // 1.选区为空时： 1.2.没按住ctrl   1.2.1. mousedown 没选中的结点 => 选中
+        else {
+          this.graph.select(cell)
+          this.setState({ curCell: cell })
+        }
       }
-      if (cell.label.slice(0, 5) === "Input") {
-        this.setState({ curCell: cell }, () => {
+      // 2.选区不为空时：
+      else {
+        // 2.选区不为空时：2.1.按住ctrl
+        if (e.ctrlKey) {
+          // 2.选区不为空时：2.1.按住ctrl 2.1.1. mousedown 没选中的结点 => 添加选中，隐藏面板
+          if (!this.graph.isSelected(cell)) {
+            this.flagNewCell = cell
+            console.log(11, this.flagNewCell)
+            this.graph.select(cell)
+            this.setState({ curCell: "" })
+            this.graph.disableSelection()
+            console.log("disableSelection")
+          }
+          // 2.选区不为空时：2.1.按住ctrl 2.1.2. mousedown 选中的结点 => 不变，交给click剔除掉选中的结点(ctrl)
+          else {
+            this.graph.disableSelection()
+            console.log("disableSelection")
+          }
+        }
+        // 2.选区不为空时： 2.2.没按住ctrl
+        else {
+          // 2.选区不为空时： 2.2.没按住ctrl 2.2.1. mousedown 没选中的结点 => 选区清空，再选中
+          if (!this.graph.isSelected(cell)) {
+            this.graph.cleanSelection()
+            this.graph.select(cell)
+            this.setState({ curCell: cell })
+          }
+          // 2.选区不为空时： 2.2.没按住ctrl 2.2.2. mousedown 选中的结点 => 不变
+          else {
+          }
+        }
+      }
+    })
+
+    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
+      // 不按ctrl return
+      if (!e.ctrlKey) return
+      // 按着ctrl 选区只有一个新结点 return
+      // if (this.graph.getSelectedCells().length === 1) return
+
+      // 选区不空，按住ctrl 还要增加新节点  解释：按下时就已经增加上了
+      this.graph.enableSelection()
+      console.log("enableSelection")
+
+      // 选区不空，按住ctrl 点击剔除已选择的结点  ！！！特别注意！！！：在mousedown之后，该cell会变为选中状态
+      if (this.graph.isSelected(cell) & !this.flagNewCell) {//!this.flagNewCell 表示老结点
+        this.graph.unselect(cell)
+      }
+      this.flagNewCell = ""
+
+      if (this.graph.getSelectedCells().length === 1) {
+        this.setState({ curCell: this.graph.getSelectedCells()[0] })
+      } else {
+        this.setState({ curCell: "" })
+      }
+
+    }
+    )
+
+    this.graph.on('cell:mouseup', ({ e, x, y }) => {
+      this.graph.enableSelection()
+    })
+
+    this.graph.on('blank:mouseup', ({ e, x, y }) => {
+      this.graph.enableSelection()
+      if (this.graph.getSelectedCells().length === 1) {//如果框选了一个，则展示面板
+        console.log(this.graph.getSelectedCells()[0])
+        this.setState({ curCell: this.graph.getSelectedCells()[0] }, () => {
+          console.log("enter blank:mouseup1", this.graph.getSelectedCells())
         })
       }
-    })
-
-    this.graph.on('cell:mouseup', ({ e, x, y, cell, view }) => {
-      this.graph.enableSelection() 
-      console.log("enter mouseup",this.graph.getSelectedCells())
-    })
-    this.graph.on('cell:click', ({ e, x, y, cell, view }) => {
-      console.log("enter click",this.graph.getSelectedCells())
-      // 1.选区为空时：
-      //            1.1.click 没选中的结点 => 选中
-      // 2.选区不为空时：
-      //            2.1.mousedown 选中的结点 => 不变
-      //            2.2.mousedown 没选中的结点 => 选区清空，选中
-      if (this.graph.getSelectedCells().length === 0) { //1.选区为空时：
-        this.graph.select(cell) //1.1.mousedown 没选中的结点 => 选中
-      }
-      else { //2.选区不为空时：
-        if (this.graph.isSelected(cell)) {// 2.1.mousedown 选中的结点 => 不变
-          console.log(this.graph.getSelectedCells())
-          return
-        } else { //2.2.mousedown 没选中的结点 => 选区清空，选中
-          this.graph.cleanSelection()
-          this.graph.select(cell)
-        }
-
-      }
+      console.log("enter blank:mouseup2", this.graph.getSelectedCells())
     })
 
     //添加cell时，显示结点详情

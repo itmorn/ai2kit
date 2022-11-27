@@ -13,7 +13,23 @@ const App = (props) => {
     return ""
   }
 
-  const showElems = () => {
+  const showText = () => {
+    const fields = ["Text"]
+    const keys = Object.keys(curCell.data);
+    return keys.map((key, index) => {
+      if (fields.includes(key)) {
+        return (
+          <Form.Item label={key} key={index}>
+            {curCell.data[key]}
+          </Form.Item>
+        )
+      }
+      return ""
+
+    })
+  }
+
+  const showInput = () => {
     const keys = Object.keys(curCell.data);
     keys.pop("Text")
     return keys.map((key, index) => {
@@ -27,12 +43,12 @@ const App = (props) => {
         </Form.Item>
       )
     })
-
-
   }
+
   return (
     <Form >
-      {showElems()}
+      {showText()}
+      {showInput()}
     </Form>
   );
 };
