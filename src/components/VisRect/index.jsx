@@ -154,6 +154,9 @@ export default class VisRect extends React.Component {
 
     //添加cell时，显示结点详情
     this.graph.on('node:added', ({ e, x, y, cell, view }) => {
+      this.graph.cleanSelection()
+      this.graph.select(cell)
+      this.setState({ curCell: cell })
       this.showNodeMoreInfo(cell)
     })
 
