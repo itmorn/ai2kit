@@ -7,8 +7,18 @@ import { Input1d, Input2d, Input3d } from './blocks/input'
 import { MaxPool } from './blocks/pool'
 import RightPannel from "../RightPannel"
 
+// useEffect(() => {
+//   window.addEventListener('keydown', onKeyDown); // 添加全局事件
+//   return () => {
+//     window.removeEventListener('keydown', onKeyDown); // 销毁
+//   };
+// }, []);
+
+
 const { Stencil } = Addon
+
 export default class VisRect extends React.Component {
+  
   state = {
     curCell: "", //当前cell的引用
     showNodeMoreInfo: true, //显示结点详情
@@ -16,9 +26,11 @@ export default class VisRect extends React.Component {
     canUndo: false,
   }
   flagNewCell = "" //指向选取非空，按住ctrl所点击的 未选择的节点
+  flagMouseEnter = "" //鼠标在元素上
   componentDidMount() {
     this.graph = new Graph({
       container: this.container,
+      // autoResize: true,
       width: 1510,
       // height:2000,
       grid: true,
@@ -30,7 +42,9 @@ export default class VisRect extends React.Component {
         multiple: true,
         strict: true,
         multipleSelectionModifiers: ['123'],
-        modifiers: null,
+        // modifiers: 'none',
+        pointerEvents: 'none',
+        // movable: false
       },
       snapline: {
         enabled: true,
@@ -47,6 +61,16 @@ export default class VisRect extends React.Component {
         container: this.minimapContainer,
       },
       history: true,
+    })
+
+    this.graph.on('cell:mouseenter', ({ e, x, y }) => {
+      this.flagMouseEnter = true
+      console.log("cell:mouseenter", this.flagMouseEnter)
+    })
+
+    this.graph.on('cell:mouseleave', ({ e, x, y }) => {
+      this.flagMouseEnter = false
+      console.log("cell:mouseleave", this.flagMouseEnter)
     })
 
     this.graph.on('cell:mousedown', ({ e, x, y, cell, view }) => {
@@ -137,11 +161,17 @@ export default class VisRect extends React.Component {
     }
     )
 
-    this.graph.on('cell:mouseup', ({ e, x, y }) => {
+    this.graph.on('cell:mouseup', ({ e, x, y, cell, view }) => {
       this.graph.enableSelection()
     })
 
-    this.graph.on('blank:mouseup', ({ e, x, y }) => {
+    this.graph.on('blank:mousedown', () => {//点击画布时，curCell引用指向空
+      this.setState({
+        curCell: ""
+      })
+    })
+
+    this.graph.on('blank:mouseup', ({ e, x, y, cell, view }) => {
       this.graph.enableSelection()
       if (this.graph.getSelectedCells().length === 1) {//如果框选了一个，则展示面板
         console.log(this.graph.getSelectedCells()[0])
@@ -159,25 +189,6 @@ export default class VisRect extends React.Component {
       this.setState({ curCell: cell })
       this.showNodeMoreInfo(cell)
     })
-
-    //点击画布时，curCell引用指向空
-    this.graph.on('blank:mousedown', () => {
-      this.setState({
-        curCell: ""
-      })
-    })
-
-    // // 选中cell
-    // this.graph.on('cell:mousedown', ({ cell, options }) => {
-    //   this.graph.resetSelection()
-    //   console.log("resetSelection",this.graph.getSelectedCells())
-    // })
-
-    // // 选中cell
-    // this.graph.on('cell:selected', ({ cell, options }) => {
-    //   console.log("选中cell",this.graph.getSelectedCells())
-    // })
-
 
     this.history = this.graph.history
     this.history.on('change', () => {
@@ -222,7 +233,7 @@ export default class VisRect extends React.Component {
     this.minimapContainer = container
   }
 
-  //设置抽屉数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
+  //设置右面板数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
   setCurCellData = (key, value) => {
     const CurCellRef = this.state.curCell
     CurCellRef.data[key] = value
@@ -295,7 +306,9 @@ export default class VisRect extends React.Component {
         </div>
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
-          <div className="app-content" ref={this.refContainer} />
+
+          <div className="app-content" ref={this.refContainer}  />
+
           <div ref={this.refMiniMapContainer} style={{ position: "absolute", left: 1400, bottom: -150 }} />
           <div style={{ alignItems: "center" }} width={100}>
             <RightPannel
