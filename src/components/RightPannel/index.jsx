@@ -9,11 +9,12 @@ import {
 const App = (props) => {
   const { curCell, setCurCell } = props
 
-  if (curCell === "") {
+  if (curCell === "" || !curCell.data) {
     return ""
   }
 
   const showText = () => {
+    console.log("showText",curCell)
     const fields = ["Text"]
     const keys = Object.keys(curCell.data);
     return keys.map((key, index) => {
