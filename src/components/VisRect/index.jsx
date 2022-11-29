@@ -63,14 +63,55 @@ export default class VisRect extends React.Component {
       history: true,
     })
 
-    this.graph.on('cell:mouseenter', ({ e, x, y }) => {
-      this.flagMouseEnter = true
-      console.log("cell:mouseenter", this.flagMouseEnter)
+    const stencil = new Stencil({
+      title: '基础模块',
+      target: this.graph,
+      search(cell, keyword) {
+        return cell.shape.indexOf(keyword) !== -1
+      },
+      placeholder: '根据名称搜索',
+      notFoundText: '没有找到',
+      collapsable: true,
+      stencilGraphWidth: 200,
+      stencilGraphHeight: 280,
+      groups: [
+        { name: 'Input', title: '输入', graphHeight: 120, layoutOptions: { columns: 2, marginX: 10, center: false, rowHeight: 50 } },
+        { name: 'Conv', title: '卷积层', graphHeight: 120, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
+        { name: 'Pool', title: '池化层', graphHeight: 60, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
+      ],
     })
 
-    this.graph.on('cell:mouseleave', ({ e, x, y }) => {
+    this.stencilContainer.appendChild(stencil.container)
+
+    stencil.load([Input1d, Input2d, Input3d], 'Input')
+    stencil.load([Conv, ConvTranspose], 'Conv')
+    stencil.load([MaxPool], 'Pool')
+
+    // cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell
+    this.graph.on('node:added', ({ e, x, y, cell, view }) => {
+      this.graph.cleanSelection()
+      this.graph.select(cell)
+      this.setState({ curCell: cell })
+      this.showNodeMoreInfo(cell)
+    })
+
+    this.graph.on('cell:mouseenter', ({ e, cell, view  }) => {
+      this.flagMouseEnter = true
+      // console.log("cell:mouseenter", this.flagMouseEnter)
+      cell.addTools({
+        name: 'button-remove',
+        args: {
+          x: '100%',
+          y: 0,
+          offset: { x: -10, y: 10 },
+        },
+      })
+    })
+
+    this.graph.on('cell:mouseleave', ({ e, cell, view  }) => {
       this.flagMouseEnter = false
-      console.log("cell:mouseleave", this.flagMouseEnter)
+      // console.log("cell:mouseleave", this.flagMouseEnter)
+      cell.removeTools()
     })
 
     this.graph.on('cell:mousedown', ({ e, x, y, cell, view }) => {
@@ -164,6 +205,7 @@ export default class VisRect extends React.Component {
       this.graph.enableSelection()
     })
 
+    //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank 
     this.graph.on('blank:mousedown', () => {//点击画布时，curCell引用指向空
       this.setState({
         curCell: ""
@@ -181,19 +223,17 @@ export default class VisRect extends React.Component {
       console.log("enter blank:mouseup2", this.graph.getSelectedCells())
     })
 
-    //添加cell时，显示结点详情
-    this.graph.on('node:added', ({ e, x, y, cell, view }) => {
-      this.graph.cleanSelection()
-      this.graph.select(cell)
-      this.setState({ curCell: cell })
-      this.showNodeMoreInfo(cell)
+    this.graph.history.on('change', () => {
+      this.setState({
+        canRedo: this.graph.history.canRedo(),
+        canUndo: this.graph.history.canUndo(),
+      })
     })
-
     this.graph.bindKey('ctrl+z', () => {
-      this.history.undo()
+      this.graph.history.undo()
     })
     this.graph.bindKey('ctrl+y', () => {
-      this.history.redo()
+      this.graph.history.redo()
     })
 
     this.graph.bindKey('ctrl+c', () => {
@@ -211,45 +251,16 @@ export default class VisRect extends React.Component {
       }
     })
 
-    this.graph.bindKey(['delete','backspace'], () => {
+    this.graph.bindKey(['delete', 'backspace'], () => {
       let cells = this.graph.getSelectedCells()
-      if(cells.length>0){
+      if (cells.length > 0) {
         this.graph.removeCells(cells)
         this.graph.cleanSelection()
       }
     })
 
-    this.history = this.graph.history
-    this.history.on('change', () => {
-      this.setState({
-        canRedo: this.history.canRedo(),
-        canUndo: this.history.canUndo(),
-      })
-    })
 
-    const stencil = new Stencil({
-      title: '基础模块',
-      target: this.graph,
-      search(cell, keyword) {
-        return cell.shape.indexOf(keyword) !== -1
-      },
-      placeholder: '根据名称搜索',
-      notFoundText: '没有找到',
-      collapsable: true,
-      stencilGraphWidth: 200,
-      stencilGraphHeight: 280,
-      groups: [
-        { name: 'Input', title: '输入', graphHeight: 120, layoutOptions: { columns: 2, marginX: 10, center: false, rowHeight: 50 } },
-        { name: 'Conv', title: '卷积层', graphHeight: 120, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
-        { name: 'Pool', title: '池化层', graphHeight: 60, layoutOptions: { columns: 1, marginX: 20, center: true, rowHeight: 50 } },
-      ],
-    })
 
-    this.stencilContainer.appendChild(stencil.container)
-
-    stencil.load([Input1d, Input2d, Input3d], 'Input')
-    stencil.load([Conv, ConvTranspose], 'Conv')
-    stencil.load([MaxPool], 'Pool')
   }
   refContainer = (container) => {
     this.container = container
@@ -305,16 +316,6 @@ export default class VisRect extends React.Component {
       cell.resize(cell.label.length * 10, 40)
     }
   }
-
-
-  // onUndo = () => {
-  //   this.history.undo()
-  // }
-
-  // onRedo = () => {
-  //   this.history.redo()
-  // }
-
 
   render() {
     return (
