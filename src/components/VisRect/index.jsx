@@ -1,24 +1,16 @@
 import React from 'react'
 import { Graph, Addon } from '@antv/x6'
-import { Button } from 'antd'
+// import { Button } from 'antd'
 import './index.css'
 import { Conv, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
 import { MaxPool } from './blocks/pool'
 import RightPannel from "../RightPannel"
 
-// useEffect(() => {
-//   window.addEventListener('keydown', onKeyDown); // 添加全局事件
-//   return () => {
-//     window.removeEventListener('keydown', onKeyDown); // 销毁
-//   };
-// }, []);
-
-
 const { Stencil } = Addon
 
 export default class VisRect extends React.Component {
-  
+
   state = {
     curCell: "", //当前cell的引用
     showNodeMoreInfo: true, //显示结点详情
@@ -28,6 +20,7 @@ export default class VisRect extends React.Component {
   flagNewCell = "" //指向选取非空，按住ctrl所点击的 未选择的节点
   flagMouseEnter = "" //鼠标在元素上
   componentDidMount() {
+
     this.graph = new Graph({
       container: this.container,
       // autoResize: true,
@@ -35,6 +28,13 @@ export default class VisRect extends React.Component {
       // height:2000,
       grid: true,
       // resizing: true,
+      clipboard: {
+        enabled: true,
+      },
+      keyboard: {
+        enabled: true,
+        global: true,
+      },
       selecting: {
         enabled: true,
         rubberband: true, // 启用框选
@@ -158,8 +158,7 @@ export default class VisRect extends React.Component {
         this.setState({ curCell: "" })
       }
 
-    }
-    )
+    })
 
     this.graph.on('cell:mouseup', ({ e, x, y, cell, view }) => {
       this.graph.enableSelection()
@@ -188,6 +187,36 @@ export default class VisRect extends React.Component {
       this.graph.select(cell)
       this.setState({ curCell: cell })
       this.showNodeMoreInfo(cell)
+    })
+
+    this.graph.bindKey('ctrl+z', () => {
+      this.history.undo()
+    })
+    this.graph.bindKey('ctrl+y', () => {
+      this.history.redo()
+    })
+
+    this.graph.bindKey('ctrl+c', () => {
+      const cells = this.graph.getSelectedCells()
+      if (cells.length) {
+        this.graph.copy(cells)
+      }
+    })
+
+    this.graph.bindKey('ctrl+v', () => {
+      if (!this.graph.isClipboardEmpty()) {
+        const cells = this.graph.paste({ offset: 32 })
+        this.graph.cleanSelection()
+        this.graph.select(cells)
+      }
+    })
+
+    this.graph.bindKey(['delete','backspace'], () => {
+      let cells = this.graph.getSelectedCells()
+      if(cells.length>0){
+        this.graph.removeCells(cells)
+        this.graph.cleanSelection()
+      }
     })
 
     this.history = this.graph.history
@@ -278,22 +307,22 @@ export default class VisRect extends React.Component {
   }
 
 
-  onUndo = () => {
-    this.history.undo()
-  }
+  // onUndo = () => {
+  //   this.history.undo()
+  // }
 
-  onRedo = () => {
-    this.history.redo()
-  }
+  // onRedo = () => {
+  //   this.history.redo()
+  // }
 
 
   render() {
     return (
-      <div >
+      <div>
         <div style={{ "display": "flex" }}>
           <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
           &nbsp;&nbsp;
-          <div className="app-btns">
+          {/* <div className="app-btns">
             <Button.Group>
               <Button onClick={this.onUndo} disabled={!this.state.canUndo}>
                 Undo
@@ -302,12 +331,12 @@ export default class VisRect extends React.Component {
                 Redo
               </Button>
             </Button.Group>
-          </div>
+          </div> */}
         </div>
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
 
-          <div className="app-content" ref={this.refContainer}  />
+          <div className="app-content" ref={this.refContainer} />
 
           <div ref={this.refMiniMapContainer} style={{ position: "absolute", left: 1400, bottom: -150 }} />
           <div style={{ alignItems: "center" }} width={100}>
