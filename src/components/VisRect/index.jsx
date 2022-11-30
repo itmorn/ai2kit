@@ -42,9 +42,7 @@ export default class VisRect extends React.Component {
         multiple: true,
         strict: true,
         multipleSelectionModifiers: ['123'],
-        // modifiers: 'none',
         pointerEvents: 'none',
-        // movable: false
       },
       connecting: {
         snap: true,
@@ -62,11 +60,12 @@ export default class VisRect extends React.Component {
         enabled: true,
         pageVisible: false,
         pageBreak: false,
-        // pannable: true,
       },
-      minimap: {
+      mousewheel: {
         enabled: true,
-        container: this.minimapContainer,
+        modifiers: ['ctrl'],
+        minScale: 0.1,
+        maxScale: 2
       },
       history: true,
     })
@@ -239,8 +238,6 @@ export default class VisRect extends React.Component {
       cell.removeTools()
     })
 
-
-
     //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank 
     this.graph.on('blank:mousedown', () => {//点击画布时，curCell引用指向空
       this.setState({
@@ -283,6 +280,13 @@ export default class VisRect extends React.Component {
         this.graph.select(cells)
       }
     })
+    this.graph.bindKey('ctrl+v', () => {
+      if (!this.graph.isClipboardEmpty()) {
+        const cells = this.graph.paste({ offset: 32 })
+        this.graph.cleanSelection()
+        this.graph.select(cells)
+      }
+    })
 
     this.graph.bindKey(['delete', 'backspace'], () => {
       let cells = this.graph.getSelectedCells()
@@ -297,16 +301,24 @@ export default class VisRect extends React.Component {
       // console.log(this.graph.getSelectedCells())
     })
 
+    this.graph.bindKey('alt', () => {
+      this.graph.enablePanning()
+      this.graph.disableSelection()
+    },'keypress')
+
+    this.graph.bindKey('alt', () => {
+      this.graph.disablePanning()
+      this.graph.enableSelection()
+    },'keyup')
   }
+
+  
   refContainer = (container) => {
     this.container = container
   }
 
   refStencil = (container) => {
     this.stencilContainer = container
-  }
-  refMiniMapContainer = (container) => {
-    this.minimapContainer = container
   }
 
   //设置右面板数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
@@ -375,7 +387,6 @@ export default class VisRect extends React.Component {
 
           <div className="app-content" ref={this.refContainer} />
 
-          <div ref={this.refMiniMapContainer} style={{ position: "absolute", left: 1400, bottom: -150 }} />
           <div style={{ alignItems: "center" }} width={100}>
             <RightPannel
               curCell={this.state.curCell} setCurCell={this.setCurCellData}
