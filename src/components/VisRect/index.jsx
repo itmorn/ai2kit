@@ -50,8 +50,9 @@ export default class VisRect extends React.Component {
         snap: true,
         allowBlank: true,//是否允许连接到画布空白位置的点，默认为 true。
         allowLoop: false,//是否允许创建循环连线，即边的起始节点和终止节点为同一节点，默认为 true。
-        sourceAnchor:'center',
+        sourceAnchor: 'center',
         targetAnchor: 'center', // 当连接到节点时，通过 targetAnchor 来指定目标节点的锚点。
+        highlight: true,
       },
       snapline: {
         enabled: true,
@@ -116,7 +117,7 @@ export default class VisRect extends React.Component {
 
       // 添加连接桩
       if (node.getPorts().length === 0) {
-        node.addPorts([{ group: 'group1' },{ group: 'group1' },{ group: 'group1' },{ group: 'group1' }])
+        node.addPorts([{ group: 'group1' }, { group: 'group1' }, { group: 'group1' }, { group: 'group1' }])
       }
     })
 
@@ -127,8 +128,8 @@ export default class VisRect extends React.Component {
       let connectedEdges = this.graph.getConnectedEdges(node)
       for (let index = 0; index < connectedEdges.length; index++) {
         const element = connectedEdges[index];
-        if ("port" in Object(element.source)){
-          element.source = {"cell":element.source["cell"]}
+        if ("port" in Object(element.source)) {
+          element.source = { "cell": element.source["cell"] }
         }
       }
       node.removeTools() //移除工具面板 这里是移除删除按钮
@@ -226,6 +227,25 @@ export default class VisRect extends React.Component {
       this.graph.enableSelection()
     })
 
+    //edge //edge //edge //edge //edge //edge //edge //edge //edge 
+    this.graph.on('edge:mouseenter', ({ cell }) => {
+      cell.addTools([
+        'source-arrowhead',
+        {
+          name: 'target-arrowhead',
+          args: {
+            attrs: {
+              fill: 'red',
+            },
+          },
+        },
+      ])
+    })
+
+    this.graph.on('edge:mouseleave', ({ cell }) => {
+      cell.removeTools()
+    })
+
     //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank 
     this.graph.on('blank:mousedown', () => {//点击画布时，curCell引用指向空
       this.setState({
@@ -282,6 +302,7 @@ export default class VisRect extends React.Component {
 
     this.graph.bindKey('p', () => {
       console.log(this.graph.getCells())
+      // console.log(this.graph.getSelectedCells())
     })
 
   }
