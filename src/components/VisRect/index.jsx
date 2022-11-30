@@ -19,8 +19,9 @@ export default class VisRect extends React.Component {
   }
   flagNewCell = "" //指向选取非空，按住ctrl所点击的 未选择的节点
   flagMouseEnter = "" //鼠标在元素上
+  
   componentDidMount() {
-
+    this.addToHistory= true
     this.graph = new Graph({
       container: this.container,
       // autoResize: true,
@@ -67,7 +68,9 @@ export default class VisRect extends React.Component {
         minScale: 0.1,
         maxScale: 2
       },
-      history: true,
+      history: {
+        enabled: true,
+      },
     })
 
     const stencil = new Stencil({
@@ -105,14 +108,17 @@ export default class VisRect extends React.Component {
     this.graph.on('node:mouseenter', ({ e, node, view }) => {
       this.flagMouseEnter = true
 
+      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
       // 添加连接桩
       if (node.getPorts().length === 0) {
         node.addPorts([{ group: 'group1' }, { group: 'group1' }, { group: 'group1' }, { group: 'group1' }])
       }
+      this.graph.history.undoStack = undoStack
     })
 
     this.graph.on('node:mouseleave', ({ e, node, view }) => {
       this.flagMouseEnter = false
+      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
       // 遍历和该node相连的边，将源的port删除
       let connectedEdges = this.graph.getConnectedEdges(node)
       for (let index = 0; index < connectedEdges.length; index++) {
@@ -122,6 +128,8 @@ export default class VisRect extends React.Component {
         }
       }
       node.removePorts() //移除连接桩
+      this.graph.history.undoStack = undoStack
+
     })
 
     this.graph.on('cell:mousedown', ({ e, x, y, cell, view }) => {
@@ -298,21 +306,22 @@ export default class VisRect extends React.Component {
 
     this.graph.bindKey('p', () => {
       console.log(this.graph.getCells())
+      console.log(this.graph.history)
       // console.log(this.graph.getSelectedCells())
     })
 
     this.graph.bindKey('alt', () => {
       this.graph.enablePanning()
       this.graph.disableSelection()
-    },'keypress')
+    }, 'keypress')
 
     this.graph.bindKey('alt', () => {
       this.graph.disablePanning()
       this.graph.enableSelection()
-    },'keyup')
+    }, 'keyup')
   }
 
-  
+
   refContainer = (container) => {
     this.container = container
   }
@@ -330,15 +339,15 @@ export default class VisRect extends React.Component {
 
   // 复选框——显示结点详情
   changeNodeMoreInfo = (e) => {
+    let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
     this.setState({
       showNodeMoreInfo: !this.state.showNodeMoreInfo
     }, () => {
-      // 遍历每个结点
       const cells = this.graph.getCells()
-      // cells.forEach(cell => { cell.visible = !this.state.showNodeMoreInfo })
       cells.forEach(cell => {
         this.showNodeMoreInfo(cell)
       })
+      this.graph.history.undoStack = undoStack
     })
   }
 
