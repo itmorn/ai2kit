@@ -105,15 +105,6 @@ export default class VisRect extends React.Component {
 
     this.graph.on('node:mouseenter', ({ e, node, view }) => {
       this.flagMouseEnter = true
-      // 添加工具面板
-      node.addTools({
-        name: 'button-remove',
-        args: {
-          x: '100%',
-          y: 0,
-          offset: { x: -10, y: 10 },
-        },
-      })
 
       // 添加连接桩
       if (node.getPorts().length === 0) {
@@ -124,7 +115,6 @@ export default class VisRect extends React.Component {
     this.graph.on('node:mouseleave', ({ e, node, view }) => {
       this.flagMouseEnter = false
       // 遍历和该node相连的边，将源的port删除
-      console.log(node)
       let connectedEdges = this.graph.getConnectedEdges(node)
       for (let index = 0; index < connectedEdges.length; index++) {
         const element = connectedEdges[index];
@@ -132,7 +122,6 @@ export default class VisRect extends React.Component {
           element.source = { "cell": element.source["cell"] }
         }
       }
-      node.removeTools() //移除工具面板 这里是移除删除按钮
       node.removePorts() //移除连接桩
     })
 
@@ -227,8 +216,12 @@ export default class VisRect extends React.Component {
       this.graph.enableSelection()
     })
 
+    this.graph.on('cell:contextmenu', ({ cell }) => {//右键删除cell
+      this.graph.removeCell(cell)
+    })
+
     //edge //edge //edge //edge //edge //edge //edge //edge //edge 
-    this.graph.on('edge:mouseenter', ({ cell }) => {
+    this.graph.on('edge:mouseenter', ({ cell }) => { //边高亮
       cell.addTools([
         'source-arrowhead',
         {
@@ -242,9 +235,11 @@ export default class VisRect extends React.Component {
       ])
     })
 
-    this.graph.on('edge:mouseleave', ({ cell }) => {
+    this.graph.on('edge:mouseleave', ({ cell }) => {//边取消高亮
       cell.removeTools()
     })
+
+
 
     //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank //blank 
     this.graph.on('blank:mousedown', () => {//点击画布时，curCell引用指向空
@@ -256,12 +251,9 @@ export default class VisRect extends React.Component {
     this.graph.on('blank:mouseup', ({ e, x, y, cell, view }) => {
       this.graph.enableSelection()
       if (this.graph.getSelectedCells().length === 1) {//如果框选了一个，则展示面板
-        console.log(this.graph.getSelectedCells()[0])
         this.setState({ curCell: this.graph.getSelectedCells()[0] }, () => {
-          console.log("enter blank:mouseup1", this.graph.getSelectedCells())
         })
       }
-      console.log("enter blank:mouseup2", this.graph.getSelectedCells())
     })
 
     this.graph.history.on('change', () => {

@@ -14,7 +14,6 @@ const App = (props) => {
   }
 
   const showText = () => {
-    console.log("showText",curCell)
     const fields = ["Text"]
     const keys = Object.keys(curCell.data);
     return keys.map((key, index) => {
