@@ -9,18 +9,18 @@ import {
 const App = (props) => {
   const { curCell, setCurCell } = props
 
-  if (curCell === "" || !curCell.data) {
+  if (curCell === "" || !curCell.attrs.data) {
     return ""
   }
 
   const showText = () => {
     const fields = ["Text"]
-    const keys = Object.keys(curCell.data);
+    const keys = Object.keys(curCell.attrs.data);
     return keys.map((key, index) => {
       if (fields.includes(key)) {
         return (
           <Form.Item label={key} key={index}>
-            {curCell.data[key]}
+            {curCell.attrs.data[key]}
           </Form.Item>
         )
       }
@@ -30,12 +30,12 @@ const App = (props) => {
   }
 
   const showInput = () => {
-    const keys = Object.keys(curCell.data);
+    const keys = Object.keys(curCell.attrs.data);
     keys.pop("Text")
     return keys.map((key, index) => {
       return (
         <Form.Item label={key} key={index}>
-          <InputNumber min={1} value={curCell.data[key]} defaultValue={1}
+          <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
             onChange={(num) => {
               if (num === null) {
                 num = 1

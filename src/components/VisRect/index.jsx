@@ -72,8 +72,6 @@ export default class VisRect extends React.Component {
       },
       history: {
         enabled: true,
-        revertOptionsList: [ 'Text' ],
-        applyOptionsList: [ 'Text' ],
       },
     })
 
@@ -311,13 +309,6 @@ export default class VisRect extends React.Component {
         this.graph.select(cells)
       }
     })
-    this.graph.bindKey('ctrl+v', () => {
-      if (!this.graph.isClipboardEmpty()) {
-        const cells = this.graph.paste({ offset: 32 })
-        this.graph.cleanSelection()
-        this.graph.select(cells)
-      }
-    })
 
     this.graph.bindKey(['delete', 'backspace'], () => {
       let cells = this.graph.getSelectedCells()
@@ -330,6 +321,7 @@ export default class VisRect extends React.Component {
     this.graph.bindKey('p', () => {
       // console.log(this.graph.getCells())
       console.log(this.graph.history.undoStack)
+      console.log(this.graph.history.redoStack)
       // console.log(this.graph.getSelectedCells())
     })
 
@@ -356,8 +348,9 @@ export default class VisRect extends React.Component {
   //设置右面板数据：根据cell的引用地址，直接修改cell的值，就会导致当前cell的重新渲染
   setCurCellData = (key, value) => {
     const CurCellRef = this.state.curCell
-    CurCellRef.data[key] = value
-    this.showNodeMoreInfo(CurCellRef)
+    let valuePrev = CurCellRef.attrs.data[key]
+    CurCellRef.attrs.data[key] = value
+    this.showNodeMoreInfo(CurCellRef,"changeNodeData",key, valuePrev)
   }
 
   // 复选框——显示结点详情
@@ -375,15 +368,15 @@ export default class VisRect extends React.Component {
   }
 
   // 根据cell的引用直接修改cell的值，并自动重新渲染
-  showNodeMoreInfo(cell) {
+  showNodeMoreInfo(cell,changeHistoryCase="",...args) {
     if (this.state.showNodeMoreInfo) {
-      let label = cell.data.Text
+      let label = cell.attrs.data.Text
       let heightNew = 0
       let widthNew = label.length
-      for (let key in cell.data) {
+      for (let key in cell.attrs.data) {
         if ("Text" === key)
           continue
-        let line = "\n" + key + ": " + cell.data[key]
+        let line = "\n" + key + ": " + cell.attrs.data[key]
         label += line
         heightNew += 1
         widthNew = Math.max(widthNew, line.length)
@@ -392,12 +385,28 @@ export default class VisRect extends React.Component {
       cell.label = label
       cell.resize(widthNew * 10, 40 + heightNew * 12)
       this.graph.stopBatch()
+      // let a = this.graph.history.undoStack[-1][0]
     }
     else {
       this.graph.startBatch()
-      cell.label = cell.data.Text
+      cell.label = cell.attrs.data.Text
       cell.resize(cell.label.length * 10, 40)
       this.graph.stopBatch()
+    }
+
+    // 根据情况对历史记录中的prev进行修正
+    switch (changeHistoryCase) {
+      case "changeNodeData":
+        console.log(args)
+        let key = args[0]
+        let valuePrev = args[1]
+
+        console.log(11111,key, valuePrev)
+        this.graph.history.undoStack.at(-1).at(0).data.prev.attrs.data[key] = valuePrev
+        break;
+    
+      default:
+        break;
     }
   }
 

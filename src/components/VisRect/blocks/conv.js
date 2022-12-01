@@ -8,10 +8,11 @@ export const Conv = new Rect({
     attrs: {
         rect: { fill: '#E1D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Conv', fill: 'white' },
+        data: {
+            "Text": 'Conv'
+        }
     },
-    data: {
-        "Text": 'Conv'
-    }
+    
 })
 export const ConvTranspose = new Rect({
     width: 'ConvTranspose'.length*10,
@@ -19,10 +20,11 @@ export const ConvTranspose = new Rect({
     attrs: {
         rect: { fill: '#3120C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'ConvTranspose', fill: 'white' },
+        data: {
+            "Text": 'ConvTranspose'
+        }
     },
-    data: {
-        "Text": 'ConvTranspose'
-    }
+    
 })
 
 

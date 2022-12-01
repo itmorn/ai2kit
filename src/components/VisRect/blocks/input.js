@@ -8,11 +8,12 @@ export const Input1d = new Rect({
     attrs: {
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input1d', fill: 'white' },
-        data: {"Channel": 32, "Length": 5123, "Text": 'Inputxd'}
+        data: {
+            "Channel": 3, "Length": 512, "Text": 'Input1d'
+        },
     },
-    data: {
-        "Channel": 3, "Length": 512, "Text": 'Input1d'
-    },
+    Channel:3,
+    
     ports: {
         groups: {
             group1: {
@@ -37,10 +38,11 @@ export const Input2d = new Rect({
     attrs: {
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input2d', fill: 'white' },
+        data: {
+            "Channel": 3, "Height": 224, "Width": 224, "Text": 'Input2d'
+        },
     },
-    data: {
-        "Channel": 3, "Height": 224, "Width": 224, "Text": 'Input2d'
-    },
+    
     ports: {
         groups: {
             group1: {
@@ -65,10 +67,11 @@ export const Input3d = new Rect({
     attrs: {
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input3d', fill: 'white' },
+        data: {
+            "Channel": 3, "Dimension": 5, "Height": 224, "Width": 224, "Text": 'Input3d'
+        },
     },
-    data: {
-        "Channel": 3, "Dimension": 5, "Height": 224, "Width": 224, "Text": 'Input3d'
-    },
+    
     ports: {
         groups: {
             group1: {
