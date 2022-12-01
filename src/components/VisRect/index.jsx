@@ -19,9 +19,9 @@ export default class VisRect extends React.Component {
   }
   flagNewCell = "" //指向选取非空，按住ctrl所点击的 未选择的节点
   flagMouseEnter = "" //鼠标在元素上
-  
+
   componentDidMount() {
-    this.addToHistory= true
+    this.addToHistory = true
     this.graph = new Graph({
       container: this.container,
       // autoResize: true,
@@ -110,7 +110,7 @@ export default class VisRect extends React.Component {
     this.graph.on('node:mouseenter', ({ e, node, view }) => {
       this.flagMouseEnter = true
 
-      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
+      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       // 添加连接桩
       if (node.getPorts().length === 0) {
         node.addPorts([{ group: 'group1' }, { group: 'group1' }, { group: 'group1' }, { group: 'group1' }])
@@ -120,7 +120,7 @@ export default class VisRect extends React.Component {
 
     this.graph.on('node:mouseleave', ({ e, node, view }) => {
       // console.log("node:mouseleave")
-      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
+      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       this.flagMouseEnter = false
       // 遍历和该node相连的边，将源的port删除
       let connectedEdges = this.graph.getConnectedEdges(node)
@@ -130,7 +130,7 @@ export default class VisRect extends React.Component {
           element.source = { "cell": element.source["cell"] }
         }
       }
-      
+
       node.removePorts() //移除连接桩
       this.graph.history.undoStack = undoStack
 
@@ -233,7 +233,7 @@ export default class VisRect extends React.Component {
 
     //edge //edge //edge //edge //edge //edge //edge //edge //edge 
     this.graph.on('edge:mouseenter', ({ cell }) => { //边高亮
-      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
+      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       cell.addTools([
         'source-arrowhead',
         {
@@ -249,7 +249,7 @@ export default class VisRect extends React.Component {
     })
 
     this.graph.on('edge:mouseleave', ({ cell }) => {//边取消高亮
-      let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
+      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       cell.removeTools()
       this.graph.history.undoStack = undoStack
     })
@@ -280,9 +280,9 @@ export default class VisRect extends React.Component {
     //   console.log('undo')
     //   // code here
     // })
-    this.graph.history.on('add', (cmds,options) => { 
+    this.graph.history.on('add', (cmds, options) => {
 
-      console.log(cmds)
+      // console.log(cmds)
       // console.log(this.graph.history.undoStack)
       // console.log(options)
       // code here
@@ -313,9 +313,12 @@ export default class VisRect extends React.Component {
     this.graph.bindKey(['delete', 'backspace'], () => {
       let cells = this.graph.getSelectedCells()
       if (cells.length > 0) {
-        this.graph.removeCells(cells)
+        this.graph.removeCells(cells, { disconnectEdges: true })
         this.graph.cleanSelection()
       }
+
+      this.setState({ curCell: "" })
+
     })
 
     this.graph.bindKey('p', () => {
@@ -350,12 +353,12 @@ export default class VisRect extends React.Component {
     const CurCellRef = this.state.curCell
     let valuePrev = CurCellRef.attrs.data[key]
     CurCellRef.attrs.data[key] = value
-    this.showNodeMoreInfo(CurCellRef,"changeNodeData",key, valuePrev)
+    this.showNodeMoreInfo(CurCellRef, "changeNodeData", key, valuePrev)
   }
 
   // 复选框——显示结点详情
   changeNodeMoreInfo = (e) => {
-    let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
+    let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
     this.setState({
       showNodeMoreInfo: !this.state.showNodeMoreInfo
     }, () => {
@@ -368,7 +371,7 @@ export default class VisRect extends React.Component {
   }
 
   // 根据cell的引用直接修改cell的值，并自动重新渲染
-  showNodeMoreInfo(cell,changeHistoryCase="",...args) {
+  showNodeMoreInfo(cell, changeHistoryCase = "", ...args) {
     if (this.state.showNodeMoreInfo) {
       let label = cell.attrs.data.Text
       let heightNew = 0
@@ -401,10 +404,10 @@ export default class VisRect extends React.Component {
         let key = args[0]
         let valuePrev = args[1]
 
-        console.log(11111,key, valuePrev)
+        console.log(11111, key, valuePrev)
         this.graph.history.undoStack.at(-1).at(0).data.prev.attrs.data[key] = valuePrev
         break;
-    
+
       default:
         break;
     }
