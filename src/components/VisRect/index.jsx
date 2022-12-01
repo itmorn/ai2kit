@@ -39,7 +39,9 @@ export default class VisRect extends React.Component {
       selecting: {
         enabled: true,
         rubberband: true, // 启用框选
+        rubberEdge: true,
         showNodeSelectionBox: true,
+        showEdgeSelectionBox: true,
         multiple: true,
         strict: true,
         multipleSelectionModifiers: ['123'],
@@ -70,6 +72,8 @@ export default class VisRect extends React.Component {
       },
       history: {
         enabled: true,
+        revertOptionsList: [ 'Text' ],
+        applyOptionsList: [ 'Text' ],
       },
     })
 
@@ -117,7 +121,7 @@ export default class VisRect extends React.Component {
     })
 
     this.graph.on('node:mouseleave', ({ e, node, view }) => {
-      console.log("node:mouseleave")
+      // console.log("node:mouseleave")
       let undoStack =  JSON.parse(JSON.stringify(this.graph.history.undoStack)) 
       this.flagMouseEnter = false
       // 遍历和该node相连的边，将源的port删除
@@ -273,6 +277,19 @@ export default class VisRect extends React.Component {
         canUndo: this.graph.history.canUndo(),
       })
     })
+
+    // this.graph.history.on('undo', (cmds,options) => { 
+    //   console.log('undo')
+    //   // code here
+    // })
+    this.graph.history.on('add', (cmds,options) => { 
+
+      console.log(cmds)
+      // console.log(this.graph.history.undoStack)
+      // console.log(options)
+      // code here
+    })
+
     this.graph.bindKey('ctrl+z', () => {
       this.graph.history.undo()
     })
@@ -311,17 +328,17 @@ export default class VisRect extends React.Component {
     })
 
     this.graph.bindKey('p', () => {
-      console.log(this.graph.getCells())
+      // console.log(this.graph.getCells())
       console.log(this.graph.history.undoStack)
       // console.log(this.graph.getSelectedCells())
     })
 
-    this.graph.bindKey('alt', () => {
+    this.graph.bindKey('shift', () => {
       this.graph.enablePanning()
       this.graph.disableSelection()
     }, 'keypress')
 
-    this.graph.bindKey('alt', () => {
+    this.graph.bindKey('shift', () => {
       this.graph.disablePanning()
       this.graph.enableSelection()
     }, 'keyup')
@@ -371,12 +388,16 @@ export default class VisRect extends React.Component {
         heightNew += 1
         widthNew = Math.max(widthNew, line.length)
       }
+      this.graph.startBatch()
       cell.label = label
       cell.resize(widthNew * 10, 40 + heightNew * 12)
+      this.graph.stopBatch()
     }
     else {
+      this.graph.startBatch()
       cell.label = cell.data.Text
       cell.resize(cell.label.length * 10, 40)
+      this.graph.stopBatch()
     }
   }
 

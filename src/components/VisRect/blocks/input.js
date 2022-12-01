@@ -8,6 +8,7 @@ export const Input1d = new Rect({
     attrs: {
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input1d', fill: 'white' },
+        data: {"Channel": 32, "Length": 5123, "Text": 'Inputxd'}
     },
     data: {
         "Channel": 3, "Length": 512, "Text": 'Input1d'

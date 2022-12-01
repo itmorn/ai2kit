@@ -35,8 +35,11 @@ const App = (props) => {
     return keys.map((key, index) => {
       return (
         <Form.Item label={key} key={index}>
-          <InputNumber min={1} value={curCell.data[key]}
+          <InputNumber min={1} value={curCell.data[key]} defaultValue={1}
             onChange={(num) => {
+              if (num === null) {
+                num = 1
+              }
               setCurCell(key, num)
             }}
           />
