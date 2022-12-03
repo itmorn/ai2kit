@@ -1,2 +1,5 @@
 node_modules
+server\.idea
+server\model_scripted.pt
+server\model.onnx
 0*

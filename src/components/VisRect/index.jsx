@@ -120,8 +120,8 @@ export default class VisRect extends React.Component {
 
     this.graph.on('node:mouseleave', ({ e, node, view }) => {
       // console.log("node:mouseleave")
-      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       this.flagMouseEnter = false
+      let undoStack = JSON.parse(JSON.stringify(this.graph.history.undoStack))
       // 遍历和该node相连的边，将源的port删除
       let connectedEdges = this.graph.getConnectedEdges(node)
       for (let index = 0; index < connectedEdges.length; index++) {
@@ -316,9 +316,7 @@ export default class VisRect extends React.Component {
         this.graph.removeCells(cells, { disconnectEdges: true })
         this.graph.cleanSelection()
       }
-
       this.setState({ curCell: "" })
-
     })
 
     this.graph.bindKey('p', () => {
