@@ -9,11 +9,9 @@ export const Input1d = new Rect({
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input1d', fill: 'white' },
         data: {
-            "Channel": 3, "Length": 512, "Text": 'Input1d'
+            "Text": 'Input1d', "Channel": 3, "Length": 512
         },
     },
-    Channel:3,
-    
     ports: {
         groups: {
             group1: {
@@ -39,10 +37,10 @@ export const Input2d = new Rect({
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input2d', fill: 'white' },
         data: {
-            "Channel": 3, "Height": 224, "Width": 224, "Text": 'Input2d'
+            "Text": 'Input2d', "Channel": 3, "Height": 224, "Width": 224
         },
     },
-    
+
     ports: {
         groups: {
             group1: {
@@ -68,10 +66,10 @@ export const Input3d = new Rect({
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input3d', fill: 'white' },
         data: {
-            "Channel": 3, "Dimension": 5, "Height": 224, "Width": 224, "Text": 'Input3d'
+            "Text": 'Input3d', "Channel": 3, "Dimension": 5, "Height": 224, "Width": 224
         },
     },
-    
+
     ports: {
         groups: {
             group1: {

@@ -14,44 +14,41 @@ const App = (props) => {
   }
 
   const showText = () => {
-    const fields = ["Text"]
+    return (
+      <Form.Item label="Text">
+        {curCell.attrs.data["Text"]}
+      </Form.Item>
+    )
+
+  }
+
+  const showElems = () => {
+    const nnType = curCell.attrs.data["Text"]
     const keys = Object.keys(curCell.attrs.data);
-    return keys.map((key, index) => {
-      if (fields.includes(key)) {
+    return keys.slice(1,keys.length).map((key, index) => {
+      if (nnType.slice(0,5)==="Input") {
         return (
           <Form.Item label={key} key={index}>
-            {curCell.attrs.data[key]}
+            <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
+              onChange={(num) => {
+                if (num === null) {
+                  num = 1
+                }
+                setCurCell(key, num)
+              }}
+            />
           </Form.Item>
         )
-      }
-      return ""
+      } 
 
     })
   }
 
-  const showInput = () => {
-    const keys = Object.keys(curCell.attrs.data);
-    keys.pop("Text")
-    return keys.map((key, index) => {
-      return (
-        <Form.Item label={key} key={index}>
-          <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-            onChange={(num) => {
-              if (num === null) {
-                num = 1
-              }
-              setCurCell(key, num)
-            }}
-          />
-        </Form.Item>
-      )
-    })
-  }
 
   return (
     <Form >
       {showText()}
-      {showInput()}
+      {showElems()}
     </Form>
   );
 };

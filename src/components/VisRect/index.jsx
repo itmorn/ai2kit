@@ -2,7 +2,7 @@ import React from 'react'
 import { Graph, Addon } from '@antv/x6'
 // import { Button } from 'antd'
 import './index.css'
-import { Conv, ConvTranspose } from './blocks/conv'
+import { Conv1d, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
 import { MaxPool } from './blocks/pool'
 import RightPannel from "../RightPannel"
@@ -96,7 +96,7 @@ export default class VisRect extends React.Component {
     this.stencilContainer.appendChild(stencil.container)
 
     stencil.load([Input1d, Input2d, Input3d], 'Input')
-    stencil.load([Conv, ConvTranspose], 'Conv')
+    stencil.load([Conv1d, ConvTranspose], 'Conv')
     stencil.load([MaxPool], 'Pool')
 
     // cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell// cell
@@ -335,7 +335,10 @@ export default class VisRect extends React.Component {
       this.graph.disablePanning()
       this.graph.enableSelection()
     }, 'keyup')
+
   }
+
+
 
 
   refContainer = (container) => {

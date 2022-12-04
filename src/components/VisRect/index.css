@@ -19,6 +19,9 @@
   margin-right: 8px; */
   box-shadow: 0 0 10px 1px #e9e9e9;
 }
+.asdf {
+  box-shadow: 0 0 10px 1px #27be8c;
+}
 
 .x6-graph-scroller {
   border: 1px solid #f0f0f0;
