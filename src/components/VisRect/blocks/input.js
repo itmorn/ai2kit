@@ -66,7 +66,7 @@ export const Input3d = new Rect({
         rect: { fill: '#31D0C6', stroke: '#4B4A67', strokeWidth: 6 },
         text: { text: 'Input3d', fill: 'white' },
         data: {
-            "Text": 'Input3d', "Channel": 3, "Dimension": 5, "Height": 224, "Width": 224
+            "Text": 'Input3d', "Channel": 3, "Depth": 5, "Height": 224, "Width": 224
         },
     },
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Graph, Addon } from '@antv/x6'
-// import { Button } from 'antd'
 import './index.css'
 import { Conv1d, ConvTranspose } from './blocks/conv'
 import { Input1d, Input2d, Input3d } from './blocks/input'
@@ -25,7 +24,7 @@ export default class VisRect extends React.Component {
     this.graph = new Graph({
       container: this.container,
       // autoResize: true,
-      width: 1510,
+      // width: "100%",
       // height:2000,
       grid: true,
       // resizing: true,
@@ -420,23 +419,13 @@ export default class VisRect extends React.Component {
         <div style={{ "display": "flex" }}>
           <input type="checkbox" defaultChecked={this.state.showNodeMoreInfo} onClick={this.changeNodeMoreInfo} />显示结点详情
           &nbsp;&nbsp;
-          {/* <div className="app-btns">
-            <Button.Group>
-              <Button onClick={this.onUndo} disabled={!this.state.canUndo}>
-                Undo
-              </Button>
-              <Button onClick={this.onRedo} disabled={!this.state.canRedo}>
-                Redo
-              </Button>
-            </Button.Group>
-          </div> */}
         </div>
         <div className="app">
           <div className="app-stencil" ref={this.refStencil} />
-
+          
           <div className="app-content" ref={this.refContainer} />
 
-          <div style={{ alignItems: "center" }} width={100}>
+          <div style={{ alignItems: "center" }}>
             <RightPannel
               curCell={this.state.curCell} setCurCell={this.setCurCellData}
             />
