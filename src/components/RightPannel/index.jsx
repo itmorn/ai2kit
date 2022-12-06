@@ -2,15 +2,15 @@ import React from 'react';
 import {
   Image,
   InputNumber,
+  Popover,
 } from 'antd';
 import {
   QuestionCircleOutlined,
 } from '@ant-design/icons';
-import imgURL from './imgs/conv1d-1.png';
+import a001_Input1d from './imgs/a001_Input1d.png';
+import a002_Input2d from './imgs/a002_Input2d.png';
+import a003_Input3d from './imgs/a003_Input3d.png';
 import './index.css'
-
-
-
 
 const App = (props) => {
   const { curCell, setCurCell } = props
@@ -34,115 +34,114 @@ const App = (props) => {
     const nnType = curCell.attrs.data["Text"]
     const keys = Object.keys(curCell.attrs.data);
     return keys.slice(1, keys.length).map((key, index) => {
-      if (nnType.slice(0, 5) === "Input") {
-        if (key === "Channel") {
-          return (
-            // <li style={{listStyleType:"none"}} key={index}>
-            <li className='item' key={index}>
-              <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title="输入张量的通道数" />
-                {key + " (int):"}
-                <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-                  onChange={(num) => {
-                    if (num === null) {
-                      num = 1
-                    }
-                    setCurCell(key, num)
-                  }} />
-                <hr />
-              </>
-            </li >
+      if (nnType === "Input1d") {
+        const content = (
+          <div>
+            <p>{key === "Channel" ? "输入张量的通道数" : "输入张量的长度"}</p>
+            <Image src={a001_Input1d} width={300} /><br />
+          </div>
+        );
+        return (
+          <li className='item' key={index}>
+            <>
+              <Popover content={content} >
+                <QuestionCircleOutlined style={{ color: "#a78a09" }} />
+              </Popover>
+              {key + " (int):"}
+              <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
+                onChange={(num) => {
+                  if (num === null) {
+                    num = 1
+                  }
+                  setCurCell(key, num)
+                }} />
+              <hr />
+            </>
+          </li >
+        )
+      }
+      else if (nnType === "Input2d") {
+        let a = ""
+        if (key === "Channel") a = "输入张量的通道数"
+        else if (key === "Height") a = "输入张量的高度"
+        else if (key === "Width") a = "输入张量的宽度"
+        const content = (
+          <div>
+            <p>{a}</p>
+            <Image src={a002_Input2d} width={300} /><br />
+          </div>
+        );
+        return (
+          <li className='item' key={index}>
+            <>
+              <Popover content={content} >
+                <QuestionCircleOutlined style={{ color: "#a78a09" }} />
+              </Popover>
 
-          )
-        }
-        if (nnType === "Input1d") {
-          return (
-            <li className='item' key={index}>
-              <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title="输入张量的长度" />
-                {key + " (int):"}
-                <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-                  onChange={(num) => {
-                    if (num === null) {
-                      num = 1
-                    }
-                    setCurCell(key, num)
-                  }} />
-                <hr />
-              </>
-            </li>
-          )
-        }
-        if (["Height", "Width"].includes(key)) {
-          return (
-            <li className='item' key={index}>
+              {key + " (int):"}
+              <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
+                onChange={(num) => {
+                  if (num === null) {
+                    num = 1
+                  }
+                  setCurCell(key, num)
+                }} />
+              <hr />
+            </>
+          </li>
+        )
 
-              <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title={"输入张量的" + (key === "Height" ? "高度" : "宽度")} />
-                {key + " (int):"}
-                <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-                  onChange={(num) => {
-                    if (num === null) {
-                      num = 1
-                    }
-                    setCurCell(key, num)
-                  }} />
-                <hr />
-              </>
-            </li>
-          )
-        }
-        if (nnType === "Input2d") {
-          return (
-            <li className='item' key={index}>
-              <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title="输入张量的长度" />
-                {key + " (int):"}
-                <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-                  onChange={(num) => {
-                    if (num === null) {
-                      num = 1
-                    }
-                    setCurCell(key, num)
-                  }} />
-                <hr />
-              </>
-            </li>
-          )
-        }
-        if (nnType === "Input3d") {
-          return (
-            <li className='item' key={index}>
-              <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title="输入张量的深度，也可以理解为时间步数" />
-                {key + " (int):"}
-                <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
-                  onChange={(num) => {
-                    if (num === null) {
-                      num = 1
-                    }
-                    setCurCell(key, num)
-                  }} />
-                <hr />
-              </>
-            </li>
-          )
-        }
+      }
+      else if (nnType === "Input3d") {
+        let a = ""
+        if (key === "Channel") a = "输入张量的通道数"
+        else if (key === "Depth") a = "输入张量的深度"
+        else if (key === "Height") a = "输入张量的高度"
+        else if (key === "Width") a = "输入张量的宽度"
+        const content = (
+          <div>
+            <p>{a}</p>
+            <Image src={a003_Input3d} width={300} /><br />
+          </div>
+        );
+        return (
+          <li className='item' key={index}>
+            <>
+              <Popover content={content} >
+                <QuestionCircleOutlined style={{ color: "#a78a09" }} />
+              </Popover>
+
+              {key + " (int):"}
+              <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
+                onChange={(num) => {
+                  if (num === null) {
+                    num = 1
+                  }
+                  setCurCell(key, num)
+                }} />
+              <hr />
+            </>
+          </li>
+        )
+
       }
       else if (nnType.slice(0, 4) === "Conv") {
         if (key === "kernel_size" && nnType === "Conv1d") {
+          const content = (
+            <div>
+              <p>22222</p>
+              <Image width={150} src={a001_Input1d} /><br />
+              <p>33333</p>
+            </div>
+          );
+
           return (
             <li className='item' key={index}>
               <>
-                <QuestionCircleOutlined style={{ color: "#a78a09" }}
-                  title="卷积核的长度" />
-                kernel_size (int):<br />
-                <Image width={150} src={imgURL} /><br />
+                <Popover content={content} >
+                  <QuestionCircleOutlined style={{ color: "#a78a09" }} />
+                </Popover>
+                kernel_size:<br /><br />
                 length (int):= <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
                   onChange={(num) => {
                     if (num === null) {
@@ -155,9 +154,20 @@ const App = (props) => {
             </li>
           )
         }
+        const content = (
+          <div>
+            <p>22222</p>
+            <Image width={150} src={a001_Input1d} /><br />
+            <p>33333</p>
+          </div>
+        );
+
         return (
           <li className='item' key={index}>
             <>
+              <Popover content={content} >
+                <QuestionCircleOutlined style={{ color: "#a78a09" }} />
+              </Popover>
               {key} (int):
 
               <InputNumber min={1} value={curCell.attrs.data[key]} defaultValue={1}
